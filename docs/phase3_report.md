@@ -139,7 +139,7 @@ Running the cross-mode analysis (`python tools/analyze_results.py --compare resu
 1. **Adaptive Graph (Mode C) achieves the highest resolution rate (87.5%)** while maintaining the lowest average tool calls (9.62 vs 15.25 in Fixed-Graph) and lowest latency (86.8s vs 136.2s in Fixed-Graph).
 2. **Fixed Graph (Mode B) suffers from tool budget exhaustion**: On `sympy__sympy-14308` and `sphinx-doc__sphinx-8721`, unconditional recursive graph traversals consumed 24–26 tool calls, exhausting the agent budget and timing out before patch verification could complete.
 3. **Semantic-Only (Mode A) hits a localization horizon**: On `pytest-dev__pytest-5221` and `matplotlib__matplotlib-23456`, text search alone failed to reveal dynamic fixture dispatch or secondary 3D caller expectations, leading to test regressions or unapplied edits (`no_edit`).
-4. **Selective Graph Invocations**: In Mode C, graph calls averaged only **0.38 calls/task**—being triggered on only the 2 tasks requiring caller disambiguation (`matplotlib` and `pytest`), while allowing the 5 self-contained tasks to complete rapidly in 7–9 tool calls.
+4. **Selective Graph Invocations**: In Mode C, graph calls averaged **0.38 calls/task**—being selectively triggered on 3 tasks requiring caller disambiguation or visitor caller inspection (`matplotlib`, `pytest`, and `sympy`), while allowing the 5 self-contained tasks to complete rapidly in 7–9 tool calls.
 
 ---
 
