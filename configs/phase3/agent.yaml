@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/google/adk-python/refs/heads/main/src/google/adk/agents/config_schemas/AgentConfig.json
+# ============================================================
+# Gemma 4 Offline SWE Agent — Phase 3 Specification
+# Competition: Google - The Gemma 4 Developer Agent Competition
+# ============================================================
+
+name: gemma4_swe_agent_phase3
+
+# Competition-mandated model identifier (QAT W4A16, offline-safe).
+# Do NOT change this value — it is required by the competition harness.
+model: gemma-4-31b-it-qat-w4a16-ct
+
+description: >
+  Phase 3: Adaptive Repository Structure & Code-Graph Reasoning (9 tools).
+  A structured, adaptive repository-reasoning SWE agent for offline / air-gapped execution.
+  Combines semantic code search with on-demand structural code-graph reasoning
+  (callers, callees, symbol neighborhoods, and subgraphs) to localize defects,
+  form causal hypotheses, execute surgical edits, run targeted test suites,
+  and submit verified patches. No external APIs. No internet access.
+
+instruction: !include prompts/system.md
+
+# ── Tool registry (Phase 3: Full 9 tools) ──────────────────────────────────
+tools:
+  - run_command          # Shell commands: ls, grep, rg, git, pytest, python, etc.
+  - read_file            # Read file content, optionally with a line range.
+  - edit_file            # Make a targeted in-place replacement in a source file.
+  - write_file           # Write a new file (use /tmp for scratch; not /workspace).
+  - get_status           # Inspect the remaining tool-call budget and patch state.
+  - submit_patch         # Capture the git diff and submit as the final answer.
+  - search_similar_code  # Semantic similarity search over the repository codebase.
+  - get_code_neighbors   # Query incoming/outgoing graph neighbors (callers, callees, usages).
+  - get_code_subgraph    # Extract local relational subgraph around a symbol or module.
+
+# ── Generation / sampling config ───────────────────────────────────────────
+generate_content_config: !include configs/sampling.yaml

@@ -1,0 +1,19 @@
+# ============================================================
+# Sampling / generation configuration for Gemma 4 SWE Agent
+# Loaded via: generate_content_config: !include configs/sampling.yaml
+# ============================================================
+
+# Temperature: Low = more deterministic, fewer hallucinations.
+# For code editing tasks, 0.1–0.3 is preferred.
+temperature: 0.2
+
+# Top-p nucleus sampling — restricts token pool to cumulative prob mass.
+top_p: 0.95
+
+# Maximum tokens the model may generate per turn.
+# 32 768 gives enough room for long reasoning chains + code blocks.
+max_output_tokens: 32768
+
+# Stop sequences — not typically needed for tool-call agents but kept
+# here as a safety valve if the harness supports them.
+# stop_sequences: []
