@@ -45,14 +45,9 @@ def validate_config(yaml_path: pathlib.Path, expected_phase: int) -> None:
     # 1. YAML syntax parsing
     try:
         raw = yaml_path.read_text(encoding="utf-8")
-        safe = raw
         # Replace !include directives with dummy strings for safe PyYAML loading
-        for token in [
-            "!include prompts/system.md",
-            "!include prompts/phase2_system.md",
-            "!include configs/sampling.yaml",
-        ]:
-            safe = safe.replace(token, '"__include_placeholder__"')
+        import re
+        safe = re.sub(r"!include\s+\S+", '"__include_placeholder__"', raw)
         data = yaml.safe_load(safe)
         ok("Parses as valid YAML")
     except Exception as e:
@@ -96,29 +91,29 @@ def validate_config(yaml_path: pathlib.Path, expected_phase: int) -> None:
         else:
             fail(f"Core tool '{t}' MISSING")
 
-    if expected_phase == 2:
-        # Phase 2: Graph tools MUST be absent
+    if expected_phase == 2 or (expected_phase == 4 and "mode_a" in str(yaml_path)):
+        # Semantic only: Graph tools MUST be absent
         for t in graph_tools:
             if t not in tools:
-                ok(f"Graph tool '{t}' correctly absent from Phase 2")
+                ok(f"Graph tool '{t}' correctly absent")
             else:
-                fail(f"Graph tool '{t}' MUST NOT be present in Phase 2")
+                fail(f"Graph tool '{t}' MUST NOT be present")
         if len(tools) == 7:
-            ok(f"Tool count = 7 (strictly Phase 2 baseline)")
+            ok("Tool count = 7 (semantic-only suite)")
         else:
-            fail(f"Tool count = {len(tools)} (expected exactly 7 for Phase 2)")
+            fail(f"Tool count = {len(tools)} (expected exactly 7)")
 
-    elif expected_phase == 3:
-        # Phase 3: Graph tools MUST be present
+    else:
+        # Full graph suite: Graph tools MUST be present
         for t in graph_tools:
             if t in tools:
-                ok(f"Graph tool '{t}' present in Phase 3")
+                ok(f"Graph tool '{t}' present")
             else:
-                fail(f"Graph tool '{t}' MISSING from Phase 3")
+                fail(f"Graph tool '{t}' MISSING")
         if len(tools) == 9:
-            ok(f"Tool count = 9 (full Phase 3 repository reasoning suite)")
+            ok("Tool count = 9 (full repository reasoning suite)")
         else:
-            fail(f"Tool count = {len(tools)} (expected exactly 9 for Phase 3)")
+            fail(f"Tool count = {len(tools)} (expected exactly 9)")
 
     # 5. Unsupported / Forbidden fields
     unsupported = ("sub_agents", "adapters", "lora", "agent_fn", "agent_class")
@@ -131,19 +126,31 @@ def validate_config(yaml_path: pathlib.Path, expected_phase: int) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Validate agent YAML configurations.")
-    parser.add_argument("--phase", type=int, choices=[2, 3], help="Specific phase to validate")
+    parser.add_argument("--phase", type=int, choices=[2, 3, 4], help="Specific phase to validate")
     args = parser.parse_args()
+
+    phase4_configs = [
+        root / "configs" / "phase4" / "mode_a" / "agent.yaml",
+        root / "configs" / "phase4" / "mode_b" / "agent.yaml",
+        root / "configs" / "phase4" / "mode_c" / "agent.yaml",
+        root / "configs" / "phase4" / "mode_d" / "agent.yaml",
+    ]
 
     if args.phase == 2:
         validate_config(root / "configs" / "phase2" / "agent.yaml", 2)
     elif args.phase == 3:
         validate_config(root / "configs" / "phase3" / "agent.yaml", 3)
         validate_config(root / "agent.yaml", 3)
+    elif args.phase == 4:
+        for cfg in phase4_configs:
+            validate_config(cfg, 4)
     else:
         # Validate all configurations
         validate_config(root / "configs" / "phase2" / "agent.yaml", 2)
         validate_config(root / "configs" / "phase3" / "agent.yaml", 3)
         validate_config(root / "agent.yaml", 3)
+        for cfg in phase4_configs:
+            validate_config(cfg, 4)
 
     print()
     if errors == 0:

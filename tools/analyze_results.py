@@ -105,6 +105,10 @@ def normalize_record(r: dict) -> dict:
         "tests_passed": r.get("tests_passed", 0),
         "repair_attempts": r.get("repair_attempts", 0),
         "elapsed_s": float(elapsed) if elapsed is not None else 0.0,
+        # Mode D structured state fields (None / [] when not Mode D)
+        "confidence":          r.get("confidence"),
+        "patch_plan_set":      r.get("patch_plan_set", False),
+        "tdr_failure_classes": r.get("tdr_failure_classes", []),
     }
 
 
@@ -131,6 +135,10 @@ def analyze(raw_records: list[dict]) -> dict:
     total_tests_passed = 0
     total_repair_attempts = 0
     durations: list[float] = []
+    # Mode D
+    tdr_failure_class_counts: Counter[str] = Counter()
+    tasks_with_patch_plan = 0
+    confidence_counts: Counter[str] = Counter()
 
     for r in records:
         total_tool_calls += r["tool_calls"]
@@ -147,6 +155,13 @@ def analyze(raw_records: list[dict]) -> dict:
         total_tests_passed += r["tests_passed"]
         total_repair_attempts += r["repair_attempts"]
         durations.append(r["elapsed_s"])
+        # Mode D
+        for cls in r.get("tdr_failure_classes", []):
+            tdr_failure_class_counts[cls] += 1
+        if r.get("patch_plan_set"):
+            tasks_with_patch_plan += 1
+        if r.get("confidence"):
+            confidence_counts[r["confidence"]] += 1
 
     resolved = outcomes.get("success", 0)
     success_rate = safe_div(resolved, total) * 100.0
@@ -179,6 +194,10 @@ def analyze(raw_records: list[dict]) -> dict:
         "min_elapsed_s": min(durations) if durations else 0.0,
         "max_elapsed_s": max(durations) if durations else 0.0,
         "total_elapsed_s": sum(durations),
+        # Mode D
+        "tdr_failure_class_counts": tdr_failure_class_counts,
+        "tasks_with_patch_plan": tasks_with_patch_plan,
+        "confidence_counts": confidence_counts,
     }
 
 
@@ -223,6 +242,22 @@ def print_single_report(stats: dict, file_path: Path) -> None:
     print(f"  Avg Repair Cycles / Task:        {stats['avg_repair_attempts']:.2f}")
     print(f"  Avg Wall-Clock Time / Task:      {stats['avg_elapsed_s']:.1f}s")
     print(f"  Total Benchmark Runtime:         {stats['total_elapsed_s']:.1f}s ({stats['total_elapsed_s'] / 60.0:.1f} min)")
+
+    tdr_counts = stats.get("tdr_failure_class_counts", {})
+    if tdr_counts or stats.get("tasks_with_patch_plan", 0):
+        print("\n-- 6. MODE D STRUCTURED STATE & TDR " + "-" * 33)
+        plan_tasks = stats.get("tasks_with_patch_plan", 0)
+        print(f"  Tasks with Patch Plan written:   {plan_tasks} / {total}")
+        conf = stats.get("confidence_counts", {})
+        if conf:
+            conf_str = ", ".join(f"{k}: {v}" for k, v in sorted(conf.items()))
+            print(f"  Confidence distribution:         {conf_str}")
+        if tdr_counts:
+            print("  TDR failure classifications:")
+            for cls, cnt in sorted(tdr_counts.items()):
+                pct = safe_div(cnt, total) * 100.0
+                print(f"    - {cls:<22}: {cnt:>3} ({pct:>5.1f}%)")
+
     print("=" * 70)
 
 
@@ -249,6 +284,9 @@ def print_comparison_tables(results_list: list[tuple[str, dict]]) -> None:
         ("Avg Files Edited", lambda s: f"{s['avg_files_edited']:.2f}"),
         ("Avg Patch Size (lines)", lambda s: f"{s['avg_patch_size']:.1f}"),
         ("Avg Repairs / Task", lambda s: f"{s['avg_repair_attempts']:.2f}"),
+        ("TDR: PATCH_DEFECT", lambda s: str(s.get("tdr_failure_class_counts", {}).get("PATCH_DEFECT", "-"))),
+        ("TDR: PRE_EXISTING", lambda s: str(s.get("tdr_failure_class_counts", {}).get("PRE_EXISTING", "-"))),
+        ("Tasks w/ Patch Plan", lambda s: str(s.get("tasks_with_patch_plan", "-"))),
         ("Avg Elapsed Time (s)", lambda s: f"{s['avg_elapsed_s']:.1f}s"),
     ]
 

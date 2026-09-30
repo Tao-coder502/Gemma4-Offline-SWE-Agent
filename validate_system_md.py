@@ -158,18 +158,119 @@ def validate_phase3_prompt(p: pathlib.Path) -> None:
         fail("submit_patch not framed as final action")
 
 
+def validate_mode_b_prompt(p: pathlib.Path) -> None:
+    print(f"\n========================================================")
+    print(f" Validating Mode B Prompt (Mandatory Graph): {p.relative_to(root)}")
+    print(f"========================================================")
+
+    if not p.exists():
+        fail(f"Prompt file missing: {p}")
+        return
+
+    text = p.read_text(encoding="utf-8")
+    text_lower = text.lower()
+
+    all_9_tools = [
+        "run_command", "read_file", "edit_file", "write_file",
+        "get_status", "submit_patch", "search_similar_code",
+        "get_code_neighbors", "get_code_subgraph"
+    ]
+    for tool in all_9_tools:
+        if tool in text:
+            ok(f"'{tool}' referenced")
+        else:
+            fail(f"'{tool}' MISSING from Mode B prompt")
+
+    if any(k in text_lower for k in ("mandatory", "unconditionally", "unconditional")):
+        ok("Mandatory graph policy stated")
+    else:
+        warn("Explicit mandatory graph terminology not found")
+
+    if any(s in text_lower for s in ("offline", "air-gapped", "external api")):
+        ok("Offline constraint stated")
+    else:
+        fail("Offline constraint MISSING")
+
+    if "submit_patch" in text_lower and any(w in text_lower for w in ("final", "last", "exactly once")):
+        ok("submit_patch framed as final action")
+    else:
+        fail("submit_patch not framed as final action")
+
+
+def validate_mode_d_prompt(p: pathlib.Path) -> None:
+    print(f"\n========================================================")
+    print(f" Validating Mode D Prompt (Structured State + TDR): {p.relative_to(root)}")
+    print(f"========================================================")
+
+    if not p.exists():
+        fail(f"Prompt file missing: {p}")
+        return
+
+    text = p.read_text(encoding="utf-8")
+    text_lower = text.lower()
+
+    all_9_tools = [
+        "run_command", "read_file", "edit_file", "write_file",
+        "get_status", "submit_patch", "search_similar_code",
+        "get_code_neighbors", "get_code_subgraph"
+    ]
+    for tool in all_9_tools:
+        if tool in text:
+            ok(f"'{tool}' referenced")
+        else:
+            fail(f"'{tool}' MISSING from Mode D prompt")
+
+    # Structured Internal State check
+    if "internal state" in text_lower and "patch plan" in text_lower and "confidence" in text_lower:
+        ok("Structured internal state tracking defined")
+    else:
+        fail("Structured internal state tracking MISSING")
+
+    # Failure taxonomy & TDR loop check
+    if any(k in text_lower for k in ("patch_defect", "repair", "pre_existing")):
+        ok("Test-driven repair and failure classification defined")
+    else:
+        fail("Test-driven repair and failure classification MISSING")
+
+    # Adaptive policy check
+    if "confidence = high" in text_lower or "if confidence" in text_lower:
+        ok("Adaptive graph decision policy defined")
+    else:
+        fail("Adaptive graph decision policy MISSING")
+
+    # Offline check
+    if any(s in text_lower for s in ("offline", "air-gapped", "external api")):
+        ok("Offline constraint stated")
+    else:
+        fail("Offline constraint MISSING")
+
+    # submit_patch finality
+    if "submit_patch" in text_lower and any(w in text_lower for w in ("final", "last", "exactly once")):
+        ok("submit_patch framed as final action")
+    else:
+        fail("submit_patch not framed as final action")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Validate system prompt markdown files.")
-    parser.add_argument("--phase", type=int, choices=[2, 3], help="Specific phase prompt to validate")
+    parser.add_argument("--phase", type=int, choices=[2, 3, 4], help="Specific phase prompt to validate")
     args = parser.parse_args()
 
     if args.phase == 2:
         validate_phase2_prompt(root / "prompts" / "phase2_system.md")
     elif args.phase == 3:
         validate_phase3_prompt(root / "prompts" / "system.md")
+    elif args.phase == 4:
+        validate_phase2_prompt(root / "prompts" / "system_mode_a.md")
+        validate_mode_b_prompt(root / "prompts" / "system_mode_b.md")
+        validate_phase3_prompt(root / "prompts" / "system.md")
+        validate_mode_d_prompt(root / "prompts" / "system_mode_d.md")
     else:
         validate_phase2_prompt(root / "prompts" / "phase2_system.md")
         validate_phase3_prompt(root / "prompts" / "system.md")
+        validate_phase2_prompt(root / "prompts" / "system_mode_a.md")
+        validate_mode_b_prompt(root / "prompts" / "system_mode_b.md")
+        validate_mode_d_prompt(root / "prompts" / "system_mode_d.md")
 
     print()
     if errors == 0 and warnings == 0:

@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/google/adk-python/refs/heads/main/src/google/adk/agents/config_schemas/AgentConfig.json
+# ============================================================
+# Gemma 4 Offline SWE Agent — Phase 4 / Experiment Mode D
+# Competition: Google - The Gemma 4 Developer Agent Competition
+# ============================================================
+# Mode D: Adaptive graph + structured patch planning + test-driven repair.
+# Full capability configuration for competition submission.
+# ============================================================
+
+name: gemma4_swe_agent_mode_d
+
+model: gemma-4-31b-it-qat-w4a16-ct
+
+description: >
+  Phase 4 / Mode D — Adaptive graph + structured patch planning + test-driven repair.
+  Combines adaptive code-graph reasoning with mandatory internal structured state
+  tracking (Issue, Candidate, Hypothesis, Confidence, Patch Plan, Test Outcome,
+  Repair Decision) and a formal test-driven repair loop (max 3 cycles). This
+  configuration represents the full agent capability and is the intended
+  competition submission configuration. No external APIs. No internet access.
+
+instruction: !include prompts/system_mode_d.md
+
+# ── Tool registry (Mode D: 9 tools — full suite) ──────────────────────────────
+tools:
+  - run_command          # Shell commands: ls, grep, rg, git, pytest, python, etc.
+  - read_file            # Read file content, optionally with a line range.
+  - edit_file            # Make a targeted in-place replacement in a source file.
+  - write_file           # Write a new file (use /tmp for scratch; not /workspace).
+  - get_status           # Inspect the remaining tool-call budget and patch state.
+  - submit_patch         # Capture the git diff and submit as the final answer.
+  - search_similar_code  # Semantic similarity search over the repository codebase.
+  - get_code_neighbors   # Query incoming/outgoing graph neighbors (callers, callees, usages).
+  - get_code_subgraph    # Extract local relational subgraph around a symbol or module.
+
+generate_content_config: !include configs/sampling.yaml

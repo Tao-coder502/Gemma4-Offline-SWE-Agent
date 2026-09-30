@@ -6,13 +6,14 @@ Lightweight JSONL-based experiment logger for the Gemma 4 SWE Agent.
 Records per-task metrics to a .jsonl file so performance can be measured
 and compared across prompts, reasoning modes, and graph policies:
   - Mode A: Semantic-only
-  - Mode B: Semantic + fixed graph
-  - Mode C: Semantic + adaptive graph
+  - Mode B: Semantic + mandatory graph
+  - Mode C: Semantic + adaptive graph  (Phase 3 frozen)
+  - Mode D: Adaptive graph + structured patch planning + test-driven repair
 
 Usage (from a harness or test script):
     from tools.experiment_logger import ExperimentLogger
 
-    logger = ExperimentLogger("results/phase3_comparison.jsonl", mode="adaptive_graph")
+    logger = ExperimentLogger("results/phase4_mode_d.jsonl", mode="mode_d", phase="phase4")
     with logger.task("django__django-12345") as t:
         t.record_tool_call("search_similar_code")
         t.record_semantic_search()
@@ -21,6 +22,11 @@ Usage (from a harness or test script):
         t.record_graph_call("get_code_neighbors")
         t.record_file_edited("src/foo.py")
         t.record_patch_size(14)
+        t.record_confidence("high")
+        t.record_patch_plan_set()
+        t.record_test_attempt(passed=False)
+        t.record_tdr_failure_class("PATCH_DEFECT")
+        t.record_repair_attempt()
         t.record_test_attempt(passed=True)
         t.set_outcome("success")
     logger.close()
@@ -43,7 +49,7 @@ class TaskRecord:
 
     def __init__(self, task_id: str, mode: str = "adaptive_graph", phase: str = "phase3"):
         self.task_id           = task_id
-        self.mode              = mode          # semantic_only | fixed_graph | adaptive_graph
+        self.mode              = mode          # mode_a | mode_b | mode_c | mode_d
         self.phase             = phase
         self.outcome           = "error"       # updated by set_outcome()
         self.failure_reason: str | None = None
@@ -61,6 +67,11 @@ class TaskRecord:
         self._repair_attempts = 0
         self._start = time.monotonic()
         self._start_ts = datetime.now(timezone.utc).isoformat()
+
+        # Mode D — structured patch planning + test-driven repair signals
+        self._confidence: str | None = None          # high | medium | low
+        self._patch_plan_set: bool = False           # True when INTERNAL STATE Patch Plan was written
+        self._tdr_failure_classes: list[str] = []   # e.g. ["PATCH_DEFECT", "PRE_EXISTING"]
 
     # ── Recording helpers ────────────────────────────────────────────────────
 
@@ -109,6 +120,21 @@ class TaskRecord:
         """Call when a second (or later) edit is made after a test failure."""
         self._repair_attempts += 1
 
+    # ── Mode D — structured patch planning & TDR helpers ─────────────────────
+
+    def record_confidence(self, level: str) -> None:
+        """Record the agent's stated hypothesis confidence (high|medium|low)."""
+        valid = {"high", "medium", "low"}
+        self._confidence = level.lower() if level.lower() in valid else "unknown"
+
+    def record_patch_plan_set(self) -> None:
+        """Mark that the agent produced a structured Patch Plan in internal state."""
+        self._patch_plan_set = True
+
+    def record_tdr_failure_class(self, classification: str) -> None:
+        """Record a failure classification from the TDR loop (PATCH_DEFECT / PRE_EXISTING / BUDGET_LOW)."""
+        self._tdr_failure_classes.append(classification)
+
     def set_outcome(
         self,
         outcome: str,
@@ -134,22 +160,31 @@ class TaskRecord:
             "outcome":           self.outcome,
             "failure_reason":    self.failure_reason,
             "notes":             self.notes,
+            # ── Localization metrics ──────────────────────────────────────────
             "semantic_searches":     self._semantic_searches,
-            "semantic_search_count": self._semantic_searches,
+            "semantic_search_count": self._semantic_searches,   # alias for compatibility
             "graph_calls":           self._graph_calls,
             "symbols_inspected":     self._symbols_inspected,
             "files_inspected":       self._files_inspected,
             "files_edited":          self._files_edited,
+            # ── Patch metrics ─────────────────────────────────────────────────
             "patch_size":            self._patch_size,
+            # ── Tool budget metrics ───────────────────────────────────────────
             "tool_calls":            len(self._tool_calls),
             "tool_call_trace":       self._tool_calls,
+            # ── Validation & repair metrics ───────────────────────────────────
             "test_attempts":         self._test_attempts,
             "tests_passed":          self._tests_passed,
             "repair_attempts":       self._repair_attempts,
+            # ── Mode D structured state metrics (None/False when not Mode D) ──
+            "confidence":            self._confidence,
+            "patch_plan_set":        self._patch_plan_set,
+            "tdr_failure_classes":   self._tdr_failure_classes,
+            # ── Timestamps & timing ───────────────────────────────────────────
             "start_ts":              self._start_ts,
             "end_ts":                datetime.now(timezone.utc).isoformat(),
             "elapsed_s":             round(elapsed, 3),
-            "elapsed_time":          round(elapsed, 3),
+            "elapsed_time":          round(elapsed, 3),   # alias for compatibility
         }
 
 

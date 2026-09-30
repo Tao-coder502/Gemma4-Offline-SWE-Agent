@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/google/adk-python/refs/heads/main/src/google/adk/agents/config_schemas/AgentConfig.json
+# ============================================================
+# Gemma 4 Offline SWE Agent — Phase 4 / Experiment Mode A
+# Competition: Google - The Gemma 4 Developer Agent Competition
+# ============================================================
+# Mode A: Semantic retrieval only (control condition).
+# No graph tools. Used as ablation baseline.
+# ============================================================
+
+name: gemma4_swe_agent_mode_a
+
+# Competition-mandated model identifier (QAT W4A16, offline-safe).
+# Do NOT change this value — it is required by the competition harness.
+model: gemma-4-31b-it-qat-w4a16-ct
+
+description: >
+  Phase 4 / Mode A — Semantic-only control condition.
+  Uses semantic similarity search and exact shell search for repository
+  localization. No code-graph reasoning tools (get_code_neighbors,
+  get_code_subgraph). Serves as the ablation baseline for comparing
+  the contribution of structural reasoning. No external APIs. No internet.
+
+# System prompt: Mode A semantic-only reasoning pipeline.
+instruction: !include prompts/system_mode_a.md
+
+# ── Tool registry (Mode A: 7 tools — no graph tools) ─────────────────────────
+tools:
+  - run_command          # Shell commands: ls, grep, rg, git, pytest, python, etc.
+  - read_file            # Read file content, optionally with a line range.
+  - edit_file            # Make a targeted in-place replacement in a source file.
+  - write_file           # Write a new file (use /tmp for scratch; not /workspace).
+  - get_status           # Inspect the remaining tool-call budget and patch state.
+  - submit_patch         # Capture the git diff and submit as the final answer.
+  - search_similar_code  # Semantic similarity search over the repository codebase.
+
+# ── Generation / sampling config ───────────────────────────────────────────
+generate_content_config: !include configs/sampling.yaml

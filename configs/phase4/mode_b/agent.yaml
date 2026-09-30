@@ -1,0 +1,37 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/google/adk-python/refs/heads/main/src/google/adk/agents/config_schemas/AgentConfig.json
+# ============================================================
+# Gemma 4 Offline SWE Agent — Phase 4 / Experiment Mode B
+# Competition: Google - The Gemma 4 Developer Agent Competition
+# ============================================================
+# Mode B: Semantic retrieval + mandatory graph reasoning.
+# Graph tools are called unconditionally on every candidate.
+# Tests the upper-bound of structural context (at cost of budget).
+# ============================================================
+
+name: gemma4_swe_agent_mode_b
+
+model: gemma-4-31b-it-qat-w4a16-ct
+
+description: >
+  Phase 4 / Mode B — Semantic + mandatory graph reasoning.
+  After semantic localization, graph tools (get_code_neighbors,
+  get_code_subgraph) are called unconditionally on every candidate
+  symbol before forming the root-cause hypothesis. Tests whether
+  mandatory structural context improves patch success, at the cost
+  of higher tool-call budget consumption. No external APIs. No internet.
+
+instruction: !include prompts/system_mode_b.md
+
+# ── Tool registry (Mode B: 9 tools — full graph suite) ────────────────────────
+tools:
+  - run_command          # Shell commands: ls, grep, rg, git, pytest, python, etc.
+  - read_file            # Read file content, optionally with a line range.
+  - edit_file            # Make a targeted in-place replacement in a source file.
+  - write_file           # Write a new file (use /tmp for scratch; not /workspace).
+  - get_status           # Inspect the remaining tool-call budget and patch state.
+  - submit_patch         # Capture the git diff and submit as the final answer.
+  - search_similar_code  # Semantic similarity search over the repository codebase.
+  - get_code_neighbors   # Query incoming/outgoing graph neighbors (callers, callees, usages).
+  - get_code_subgraph    # Extract local relational subgraph around a symbol or module.
+
+generate_content_config: !include configs/sampling.yaml

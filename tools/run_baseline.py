@@ -1,19 +1,23 @@
 """
 tools/run_baseline.py
 =====================
-Phase 3 Experiment runner for the Gemma 4 SWE Agent.
+Phase 4 Experiment runner for the Gemma 4 SWE Agent.
 
-Supports evaluating and comparing three reasoning modes:
-  A. semantic_only:   Semantic search + shell grep, no graph reasoning
-  B. fixed_graph:     Forces graph neighbor inspection for all candidates
-  C. adaptive_graph:  Dynamically invokes graph tools when semantic confidence is low
+Supports evaluating and comparing four reasoning modes:
+  A. mode_a: Semantic search + shell grep, no graph reasoning
+  B. mode_b: Semantic + mandatory graph neighbor inspection on all candidates
+  C. mode_c: Semantic + adaptive graph reasoning (Phase 3 frozen baseline)
+  D. mode_d: Adaptive graph + structured patch planning + test-driven repair
+
+Legacy mode names (semantic_only, fixed_graph, adaptive_graph) are accepted
+for backward compatibility with Phase 3 result files.
 
 Usage:
     python tools/run_baseline.py \\
         --tasks   data/tasks_sample.jsonl \\
-        --results results/phase3_adaptive_graph.jsonl \\
-        --mode    adaptive_graph \\
-        --phase   phase3 \\
+        --results results/phase4_mode_d.jsonl \\
+        --mode    mode_d \\
+        --phase   phase4 \\
         [--limit  N]
 
 This script is local tooling and NOT included in submission.zip.
@@ -45,6 +49,17 @@ READ_PATTERN    = re.compile(r"read_file\s*[:\(].*?([\/\w\.\-]+\.\w+)")
 GRAPH_PATTERN   = re.compile(r"(get_code_neighbors|get_code_subgraph)\s*[:\(]")
 SYMBOL_PATTERN  = re.compile(r"(?:symbol|target)\s*=\s*['\"]?([\w\.\-]+)['\"]?")
 REPAIR_SIGNAL   = re.compile(r"(repair|retry|re-test|attempt \d)")
+
+# Canonical Phase 4 mode names + Phase 3 legacy aliases for backward compat
+MODE_CHOICES = [
+    "mode_a", "mode_b", "mode_c", "mode_d",
+    "semantic_only", "fixed_graph", "adaptive_graph",
+]
+
+# Mode D -- structured internal state signal extraction
+CONFIDENCE_PATTERN = re.compile(r"Confidence\s*:\s*(high|medium|low)", re.IGNORECASE)
+PATCH_PLAN_PATTERN = re.compile(r"Patch Plan\s*:", re.IGNORECASE)
+TDR_CLASS_PATTERN  = re.compile(r"(PATCH_DEFECT|PRE_EXISTING|BUDGET_LOW)")
 
 
 def load_tasks(path: Path, limit: int | None = None) -> list[dict]:
@@ -115,14 +130,24 @@ def parse_agent_output(output: str) -> dict:
     semantic_count = sum(1 for t in tool_calls if t == "search_similar_code")
     graph_count    = sum(1 for t in tool_calls if t in ("get_code_neighbors", "get_code_subgraph"))
 
+    # Mode D — structured state signals
+    confidence_match = CONFIDENCE_PATTERN.search(output)
+    confidence = confidence_match.group(1).lower() if confidence_match else None
+    patch_plan_set  = bool(PATCH_PLAN_PATTERN.search(output))
+    tdr_failure_classes = TDR_CLASS_PATTERN.findall(output)
+
     return {
-        "tool_call_trace":   tool_calls,
-        "semantic_searches": semantic_count,
-        "graph_calls":       graph_count,
-        "symbols_inspected": list(dict.fromkeys(symbols)),
-        "files_inspected":   list(dict.fromkeys(read_matches)),
-        "files_edited":      list(dict.fromkeys(edited_files)),
-        "repair_attempts":   repair_count,
+        "tool_call_trace":    tool_calls,
+        "semantic_searches":  semantic_count,
+        "graph_calls":        graph_count,
+        "symbols_inspected":  list(dict.fromkeys(symbols)),
+        "files_inspected":    list(dict.fromkeys(read_matches)),
+        "files_edited":       list(dict.fromkeys(edited_files)),
+        "repair_attempts":    repair_count,
+        # Mode D extras
+        "confidence":         confidence,
+        "patch_plan_set":     patch_plan_set,
+        "tdr_failure_classes": tdr_failure_classes,
     }
 
 
@@ -136,13 +161,13 @@ def run_mock_agent(task: dict, mode: str, timeout: int) -> tuple[str, str]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Run Gemma 4 SWE Agent Phase 3 baseline.")
+    parser = argparse.ArgumentParser(description="Run Gemma 4 SWE Agent Phase 4 baseline.")
     parser.add_argument("--tasks",   required=True, help="Path to tasks.jsonl")
     parser.add_argument("--results", required=True, help="Output results.jsonl path")
-    parser.add_argument("--mode",    default="adaptive_graph",
-                        choices=["semantic_only", "fixed_graph", "adaptive_graph"],
-                        help="Reasoning policy mode")
-    parser.add_argument("--phase",   default="phase3", help="Phase label")
+    parser.add_argument("--mode",    default="mode_d",
+                        choices=MODE_CHOICES,
+                        help="Reasoning policy mode (mode_a/b/c/d or legacy names)")
+    parser.add_argument("--phase",   default="phase4", help="Phase label")
     parser.add_argument("--limit",   type=int, default=None, help="Task limit")
     parser.add_argument("--timeout", type=int, default=DEFAULT_TIMEOUT_S, help="Timeout per task")
     args = parser.parse_args()
@@ -190,6 +215,14 @@ def main() -> None:
                     t.record_file_edited(f)
                 for _ in range(metrics["repair_attempts"]):
                     t.record_repair_attempt()
+
+                # Mode D structured state signals
+                if metrics.get("confidence"):
+                    t.record_confidence(metrics["confidence"])
+                if metrics.get("patch_plan_set"):
+                    t.record_patch_plan_set()
+                for cls in metrics.get("tdr_failure_classes", []):
+                    t.record_tdr_failure_class(cls)
 
                 patch_lines = compute_patch_size(repo)
                 t.record_patch_size(patch_lines)

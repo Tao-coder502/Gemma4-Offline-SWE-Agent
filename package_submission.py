@@ -42,9 +42,9 @@ def collect_entries(root: Path, phase: int = 3) -> list[tuple[str, Path]]:
         if adapters_readme.exists():
             entries.append(("adapters/README.md", adapters_readme))
 
-    else:
+    elif phase == 3:
         # Phase 3: Adaptive code-graph reasoning (9 tools)
-        agent_yaml = root / "agent.yaml"
+        agent_yaml = root / "configs" / "phase3" / "agent.yaml" if (root / "configs" / "phase3" / "agent.yaml").exists() else root / "agent.yaml"
         system_md = root / "prompts" / "system.md"
         sampling_yaml = root / "configs" / "sampling.yaml"
 
@@ -62,10 +62,30 @@ def collect_entries(root: Path, phase: int = 3) -> list[tuple[str, Path]]:
         if adapters_readme.exists():
             entries.append(("adapters/README.md", adapters_readme))
 
+    else:
+        # Phase 4 (Default): Mode D — Adaptive graph + structured patch planning + test-driven repair
+        agent_yaml = root / "configs" / "phase4" / "mode_d" / "agent.yaml"
+        system_md = root / "prompts" / "system_mode_d.md"
+        sampling_yaml = root / "configs" / "sampling.yaml"
+
+        if not agent_yaml.exists():
+            raise FileNotFoundError(f"Phase 4 Mode D agent.yaml missing: {agent_yaml}")
+        if not system_md.exists():
+            raise FileNotFoundError(f"Phase 4 Mode D prompt missing: {system_md}")
+        if not sampling_yaml.exists():
+            raise FileNotFoundError(f"Sampling config missing: {sampling_yaml}")
+
+        entries.append(("agent.yaml", agent_yaml))
+        entries.append(("prompts/system.md", system_md))
+        entries.append(("configs/sampling.yaml", sampling_yaml))
+        adapters_readme = root / "adapters" / "README.md"
+        if adapters_readme.exists():
+            entries.append(("adapters/README.md", adapters_readme))
+
     return entries
 
 
-def build_zip(root: Path, output_file: str = "submission.zip", phase: int = 3, dry_run: bool = False) -> None:
+def build_zip(root: Path, output_file: str = "submission.zip", phase: int = 4, dry_run: bool = False) -> None:
     entries = collect_entries(root, phase=phase)
 
     print(f"-- Submission Manifest (Phase {phase}) -------------------------------")
@@ -80,8 +100,14 @@ def build_zip(root: Path, output_file: str = "submission.zip", phase: int = 3, d
     out = root / output_file
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for arc, fp in entries:
-            zf.write(fp, arc)
-            print(f"  added: {arc}")
+            if arc == "agent.yaml" and phase == 4:
+                content = fp.read_text(encoding="utf-8")
+                content = content.replace("prompts/system_mode_d.md", "prompts/system.md")
+                zf.writestr("agent.yaml", content)
+                print(f"  added: {arc} (with prompts/system.md include)")
+            else:
+                zf.write(fp, arc)
+                print(f"  added: {arc}")
 
     size_kb = out.stat().st_size / 1024
     print(f"\n[OK] Created {output_file} ({size_kb:.1f} KB)")
@@ -121,8 +147,8 @@ def validate_zip(root: Path, output_file: str = "submission.zip") -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Package competition submission.")
-    parser.add_argument("--phase", type=int, choices=[2, 3], default=3,
-                        help="Phase to package (default: 3)")
+    parser.add_argument("--phase", type=int, choices=[2, 3, 4], default=4,
+                        help="Phase to package (default: 4)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Print manifest without creating zip.")
     parser.add_argument("--validate", action="store_true",
