@@ -1,19 +1,15 @@
 # ============================================================
 # Sampling / generation configuration for Gemma 4 SWE Agent
 # Loaded via: generate_content_config: !include configs/sampling.yaml
+# Aligned with Google Competition Harness Specification
 # ============================================================
 
-# Temperature: Low = more deterministic, fewer hallucinations.
-# For code editing tasks, 0.1 is proven optimal in Phase 5 optimization study.
-temperature: 0.1
+temperature: 0.2
+top_p: 0.95
+max_output_tokens: 16384
 
-# Top-p nucleus sampling — restricts token pool to cumulative prob mass.
-top_p: 0.90
+# Thinking configuration for Gemma 4 reasoning channels (<|channel>thought...<channel|>)
+thinking_config:
+  thinking_budget: 4096
+  include_thoughts: true
 
-# Maximum tokens the model may generate per turn.
-# 32 768 gives enough room for long reasoning chains + code blocks.
-max_output_tokens: 32768
-
-# Stop sequences — not typically needed for tool-call agents but kept
-# here as a safety valve if the harness supports them.
-# stop_sequences: []
