@@ -1,15 +1,10 @@
 # ============================================================
 # Sampling / generation configuration for Gemma 4 SWE Agent
 # Loaded via: generate_content_config: !include configs/sampling.yaml
-# Aligned with Google Competition Harness Specification
+# Harness-safe: vLLM (tensor_parallel_size=4) does NOT support
+# thinking_config — omitting it prevents empty-output errors.
 # ============================================================
 
 temperature: 0.2
 top_p: 0.95
-max_output_tokens: 16384
-
-# Thinking configuration for Gemma 4 reasoning channels (<|channel>thought...<channel|>)
-thinking_config:
-  thinking_budget: 4096
-  include_thoughts: true
-
+max_output_tokens: 32768
