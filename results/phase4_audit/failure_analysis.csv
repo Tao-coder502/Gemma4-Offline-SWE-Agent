@@ -1,0 +1,7 @@
+task_id,mode,failure_stage,failure_category,evidence
+matplotlib__matplotlib-23456,mode_a,LOCALIZATION,incomplete_context,Localized Axes.set_box_aspect but omitted Axes3D caller contract; broke 3D aspect ratio tests.
+sympy__sympy-14308,mode_a,BUDGET,timeout_budget,"Complex multi-line AST substitution exceeded tool budget (25 tool calls, 4 test attempts) without passing."
+pytest-dev__pytest-5221,mode_a,LOCALIZATION,wrong_localization,Semantic search failed to locate fixture scope handling in dynamic dispatch; no source edits made.
+sympy__sympy-14308,mode_b,BUDGET,timeout_budget,"Mandatory subgraph traversal consumed 5 graph calls and 26 tool calls, reaching tool budget limit."
+sphinx-doc__sphinx-8721,mode_b,BUDGET,timeout_budget,"Mandatory graph queries on ModuleAnalyzer and alias tags consumed 24 tool calls, exhausting budget before test verification."
+sympy__sympy-14308,mode_c,PATCH_GENERATION,incorrect_patch,"Correctly localized Printer._print_Pow, but initial and single unguided repair patch misaligned 2D mathematical vector formatting."

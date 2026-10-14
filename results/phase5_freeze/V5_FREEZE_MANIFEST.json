@@ -1,0 +1,47 @@
+{
+  "version": "v5.0",
+  "status": "FROZEN_DEVELOPMENT_CANDIDATE",
+  "freeze_timestamp": "2026-10-01T03:15:00Z",
+  "git_commit": "a5736c980278e60b3c5a8e2712cf28e68df56213",
+  "model": "gemma-4-31b-it-qat-w4a16-ct",
+  "model_identifier": "gemma-4-31b-it-qat-w4a16-ct",
+  "prompt_path": "prompts/system_v5_optimized.md",
+  "prompt_hash": "ab5a59b02e830772b9967012e9051a6c7c83442ed83612b39e0b36ff3621bca6",
+  "sampling_config": "configs/phase5/v5_0_final/sampling.yaml",
+  "sampling_hash": "298ba75a74286937994430731d4d1b0267eabecfbcde16e06ad5408414269e6d",
+  "root_sampling_hash": "787129dfcfcc9f8545a8a671d8314cfa1cf9ed9b27d96be6e51e21eb43610d00",
+  "agent_yaml_path": "configs/phase5/v5_0_final/agent.yaml",
+  "agent_yaml_hash": "c994bda2f443f6cb719b20793b2f26e62117bf4ff0a6d8408f036d774a4b28f1",
+  "root_agent_yaml_hash": "788c258479db550da65767d26e12484c18bb36611d110c731596bdfd6043095b",
+  "tool_registry": [
+    "edit_file",
+    "get_code_neighbors",
+    "get_code_subgraph",
+    "get_status",
+    "read_file",
+    "run_command",
+    "search_similar_code",
+    "submit_patch",
+    "write_file"
+  ],
+  "tool_registry_hash": "c2a708a27cae2b8095f4bfc79115ad5748a727a603c725a7d476210418517ef8",
+  "development_benchmark": "data/development/benchmark_tasks.jsonl",
+  "development_task_count": 8,
+  "development_benchmark_hash": "92ca377234e597ae8ba22aa23d939ca9c2c5c540b595830a674117a8357b487e",
+  "architecture_summary": {
+    "localization_policy": "Two-tier lexical-first (ripgrep) with semantic similarity fallback",
+    "graph_reasoning_policy": "Confidence-gated adaptive structural expansion (callers, callees, hierarchy)",
+    "internal_state_tracking": "Mandatory 11-slot internal state anchor",
+    "patch_minimality_policy": "Surgical diff bounds, indentation preservation, 2D relative coordinate guard",
+    "verification_policy": "Pre-patch and post-patch targeted pytest execution",
+    "repair_policy": "Bounded closed-loop test-driven repair (max 3 cycles) with traceback failure classification",
+    "stopping_policy": "Immediate termination upon test pass and clean diff verification"
+  },
+  "freeze_constraints": [
+    "Do NOT modify prompt wording, instructions, or examples.",
+    "Do NOT modify temperature (0.1), top_p (0.90), or max_output_tokens (32768).",
+    "Do NOT add, remove, or modify tool registry entries or signatures.",
+    "Do NOT modify adaptive graph gating threshold or conditions.",
+    "Do NOT tune against held-out tasks."
+  ]
+}

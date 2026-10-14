@@ -1,0 +1,8 @@
+# ============================================================
+# Optimized Sampling Configuration (Phase 5 / v5.0 Final)
+# Temperature: 0.1 for high determinism in code diffs and AST formatting
+# Top-p: 0.90 to restrict tail hallucinations
+# ============================================================
+temperature: 0.1
+top_p: 0.90
+max_output_tokens: 32768

@@ -62,8 +62,28 @@ def collect_entries(root: Path, phase: int = 3) -> list[tuple[str, Path]]:
         if adapters_readme.exists():
             entries.append(("adapters/README.md", adapters_readme))
 
+    elif phase == 5:
+        # Phase 5 (Final Production): v5.0 Optimized Agent
+        agent_yaml = root / "configs" / "phase5" / "v5_0_final" / "agent.yaml"
+        system_md = root / "prompts" / "system_v5_optimized.md"
+        sampling_yaml = root / "configs" / "phase5" / "v5_0_final" / "sampling.yaml"
+
+        if not agent_yaml.exists():
+            raise FileNotFoundError(f"Phase 5 agent.yaml missing: {agent_yaml}")
+        if not system_md.exists():
+            raise FileNotFoundError(f"Phase 5 prompt missing: {system_md}")
+        if not sampling_yaml.exists():
+            raise FileNotFoundError(f"Sampling config missing: {sampling_yaml}")
+
+        entries.append(("agent.yaml", agent_yaml))
+        entries.append(("prompts/system.md", system_md))
+        entries.append(("configs/sampling.yaml", sampling_yaml))
+        adapters_readme = root / "adapters" / "README.md"
+        if adapters_readme.exists():
+            entries.append(("adapters/README.md", adapters_readme))
+
     else:
-        # Phase 4 (Default): Mode D — Adaptive graph + structured patch planning + test-driven repair
+        # Phase 4: Mode D — Adaptive graph + structured patch planning + test-driven repair
         agent_yaml = root / "configs" / "phase4" / "mode_d" / "agent.yaml"
         system_md = root / "prompts" / "system_mode_d.md"
         sampling_yaml = root / "configs" / "sampling.yaml"
@@ -85,7 +105,7 @@ def collect_entries(root: Path, phase: int = 3) -> list[tuple[str, Path]]:
     return entries
 
 
-def build_zip(root: Path, output_file: str = "submission.zip", phase: int = 4, dry_run: bool = False) -> None:
+def build_zip(root: Path, output_file: str = "submission.zip", phase: int = 5, dry_run: bool = False) -> None:
     entries = collect_entries(root, phase=phase)
 
     print(f"-- Submission Manifest (Phase {phase}) -------------------------------")
@@ -100,9 +120,11 @@ def build_zip(root: Path, output_file: str = "submission.zip", phase: int = 4, d
     out = root / output_file
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for arc, fp in entries:
-            if arc == "agent.yaml" and phase == 4:
+            if arc == "agent.yaml" and phase in (4, 5):
                 content = fp.read_text(encoding="utf-8")
                 content = content.replace("prompts/system_mode_d.md", "prompts/system.md")
+                content = content.replace("prompts/system_v5_optimized.md", "prompts/system.md")
+                content = content.replace("configs/phase5/v5_0_final/sampling.yaml", "configs/sampling.yaml")
                 zf.writestr("agent.yaml", content)
                 print(f"  added: {arc} (with prompts/system.md include)")
             else:
@@ -147,8 +169,8 @@ def validate_zip(root: Path, output_file: str = "submission.zip") -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Package competition submission.")
-    parser.add_argument("--phase", type=int, choices=[2, 3, 4], default=4,
-                        help="Phase to package (default: 4)")
+    parser.add_argument("--phase", type=int, choices=[2, 3, 4, 5], default=5,
+                        help="Phase to package (default: 5)")
     parser.add_argument("--dry-run", action="store_true",
                         help="Print manifest without creating zip.")
     parser.add_argument("--validate", action="store_true",

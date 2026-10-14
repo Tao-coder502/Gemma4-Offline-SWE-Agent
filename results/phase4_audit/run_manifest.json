@@ -1,0 +1,81 @@
+{
+  "manifest_version": "1.0",
+  "audit_timestamp": "2026-10-01T01:42:22.803079+00:00",
+  "git_commit": "a5736c980278e60b3c5a8e2712cf28e68df56213",
+  "model": "gemma-4-31b-it-qat-w4a16-ct",
+  "sampling_config": {
+    "path": "configs/sampling.yaml",
+    "temperature": 0.2,
+    "top_p": 0.95,
+    "top_k": 40,
+    "max_output_tokens": 32768
+  },
+  "evaluation_suite": {
+    "path": "data/benchmark_tasks.jsonl",
+    "sample_size": 8,
+    "dataset_version": "v1.0-standardized"
+  },
+  "experimental_modes": {
+    "mode_a": {
+      "label": "Mode A \u2014 Semantic Control",
+      "config": "configs/phase4/mode_a/agent.yaml",
+      "prompt": "prompts/system_mode_a.md",
+      "tool_count": 7,
+      "graph_tools_permitted": false,
+      "raw_results_file": "results/phase4_ablation/mode_a.jsonl",
+      "status": "EVALUATED"
+    },
+    "mode_b": {
+      "label": "Mode B \u2014 Fixed Graph",
+      "config": "configs/phase4/mode_b/agent.yaml",
+      "prompt": "prompts/system_mode_b.md",
+      "tool_count": 9,
+      "graph_tools_permitted": true,
+      "graph_policy": "MANDATORY_UNCONDITIONAL",
+      "raw_results_file": "results/phase4_ablation/mode_b.jsonl",
+      "status": "EVALUATED"
+    },
+    "mode_c": {
+      "label": "Mode C \u2014 Adaptive Graph",
+      "config": "configs/phase4/mode_c/agent.yaml",
+      "prompt": "prompts/system.md",
+      "tool_count": 9,
+      "graph_tools_permitted": true,
+      "graph_policy": "CONFIDENCE_GATED_ADAPTIVE",
+      "raw_results_file": "results/phase4_ablation/mode_c.jsonl",
+      "status": "EVALUATED"
+    },
+    "mode_c1": {
+      "label": "Mode C1 \u2014 Adaptive Graph + Structured Internal State",
+      "config": "configs/phase4/mode_c1/agent.yaml",
+      "prompt": "prompts/system_mode_c1.md",
+      "tool_count": 9,
+      "graph_tools_permitted": true,
+      "status": "NOT_RUN",
+      "notes": "Planned modular ablation isolating structured state from TDR; not yet evaluated."
+    },
+    "mode_c2": {
+      "label": "Mode C2 \u2014 Adaptive Graph + Test-Driven Repair",
+      "config": "configs/phase4/mode_c2/agent.yaml",
+      "prompt": "prompts/system_mode_c2.md",
+      "tool_count": 9,
+      "graph_tools_permitted": true,
+      "status": "NOT_RUN",
+      "notes": "Planned modular ablation isolating TDR loop from structured state; not yet evaluated."
+    },
+    "mode_d": {
+      "label": "Mode D \u2014 Adaptive Graph + Structured Repair (Competition Candidate)",
+      "config": "configs/phase4/mode_d/agent.yaml",
+      "prompt": "prompts/system_mode_d.md",
+      "tool_count": 9,
+      "graph_tools_permitted": true,
+      "graph_policy": "CONFIDENCE_GATED_ADAPTIVE",
+      "structured_state_mandatory": true,
+      "repair_loop_enabled": true,
+      "max_repair_cycles": 3,
+      "raw_results_file": "results/phase4_ablation/mode_d.jsonl",
+      "status": "EVALUATED"
+    }
+  },
+  "analyzer_version": "tools/audit_results.py v1.0-deterministic"
+}

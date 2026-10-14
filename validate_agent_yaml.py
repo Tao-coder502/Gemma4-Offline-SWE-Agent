@@ -126,14 +126,19 @@ def validate_config(yaml_path: pathlib.Path, expected_phase: int) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Validate agent YAML configurations.")
-    parser.add_argument("--phase", type=int, choices=[2, 3, 4], help="Specific phase to validate")
+    parser.add_argument("--phase", type=int, choices=[2, 3, 4, 5], help="Specific phase to validate")
     args = parser.parse_args()
 
     phase4_configs = [
         root / "configs" / "phase4" / "mode_a" / "agent.yaml",
         root / "configs" / "phase4" / "mode_b" / "agent.yaml",
         root / "configs" / "phase4" / "mode_c" / "agent.yaml",
+        root / "configs" / "phase4" / "mode_c1" / "agent.yaml",
+        root / "configs" / "phase4" / "mode_c2" / "agent.yaml",
         root / "configs" / "phase4" / "mode_d" / "agent.yaml",
+    ]
+    phase5_configs = [
+        root / "configs" / "phase5" / "v5_0_final" / "agent.yaml",
     ]
 
     if args.phase == 2:
@@ -144,12 +149,17 @@ def main() -> None:
     elif args.phase == 4:
         for cfg in phase4_configs:
             validate_config(cfg, 4)
+    elif args.phase == 5:
+        for cfg in phase5_configs:
+            validate_config(cfg, 4)
     else:
         # Validate all configurations
         validate_config(root / "configs" / "phase2" / "agent.yaml", 2)
         validate_config(root / "configs" / "phase3" / "agent.yaml", 3)
         validate_config(root / "agent.yaml", 3)
         for cfg in phase4_configs:
+            validate_config(cfg, 4)
+        for cfg in phase5_configs:
             validate_config(cfg, 4)
 
     print()

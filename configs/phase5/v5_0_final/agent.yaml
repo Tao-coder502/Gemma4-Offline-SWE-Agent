@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/google/adk-python/refs/heads/main/src/google/adk/agents/config_schemas/AgentConfig.json
+# ============================================================
+# Gemma 4 SWE Agent — Phase 5 / Version 5.0 (Optimized Production)
+# Competition: Google - The Gemma 4 Developer Agent Competition
+# Model: gemma-4-31b-it-qat-w4a16-ct (Air-Gapped / Offline)
+# ============================================================
+
+name: gemma4_swe_agent_v5_optimized
+
+# Official competition-mandated model identifier
+model: gemma-4-31b-it-qat-w4a16-ct
+
+description: >
+  Phase 5 / v5.0 Final Production SWE Agent. Combines two-tier lexical-first localization,
+  confidence-gated adaptive code-graph reasoning, structured internal state tracking,
+  patch minimality enforcement, precision test-driven repair, and explicit early stopping
+  policies for maximum pass rate, reliability, and token efficiency in offline execution.
+
+# Optimized context-efficient system prompt
+instruction: !include prompts/system_v5_optimized.md
+
+# Official 9-tool repository reasoning suite
+tools:
+  - run_command
+  - read_file
+  - edit_file
+  - write_file
+  - get_status
+  - submit_patch
+  - search_similar_code
+  - get_code_neighbors
+  - get_code_subgraph
+
+# Optimized sampling configuration (temp=0.1, top_p=0.90)
+generate_content_config: !include configs/phase5/v5_0_final/sampling.yaml

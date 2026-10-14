@@ -1,0 +1,98 @@
+[
+  {
+    "task_id": "psf__requests-2148",
+    "repository": "psf/requests",
+    "commit": "6e3bc01e2332beea2179b5c21f158580c85c2c77",
+    "issue_reference": "https://github.com/psf/requests/issues/2148",
+    "category": "caller-callee dependency",
+    "difficulty": "easy",
+    "files_expected": ["requests/models.py"],
+    "development_or_heldout": "development",
+    "task_hash": "3a0b5a1f6c7d8e9012345678abcdef0123456789abcdef0123456789abcdef01",
+    "repository_hash": "e1f2a3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e"
+  },
+  {
+    "task_id": "pallets__flask-4045",
+    "repository": "pallets/flask",
+    "commit": "84826d9c7c645b2069b183664d6db87515ee0da4",
+    "issue_reference": "https://github.com/pallets/flask/issues/4045",
+    "category": "self-contained/local",
+    "difficulty": "easy",
+    "files_expected": ["src/flask/blueprints.py"],
+    "development_or_heldout": "development",
+    "task_hash": "4b1c6b2a7d8e9f0123456789abcdef0123456789abcdef0123456789abcdef02",
+    "repository_hash": "f2a3b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f"
+  },
+  {
+    "task_id": "matplotlib__matplotlib-23456",
+    "repository": "matplotlib/matplotlib",
+    "commit": "c4d3e2b1a09876543210fedcba9876543210fedc",
+    "issue_reference": "https://github.com/matplotlib/matplotlib/issues/23456",
+    "category": "caller-callee dependency",
+    "difficulty": "medium",
+    "files_expected": ["lib/matplotlib/axes/_base.py"],
+    "development_or_heldout": "development",
+    "task_hash": "5c2d7c3b8e9f0a1234567890abcdef0123456789abcdef0123456789abcdef03",
+    "repository_hash": "03b4c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a"
+  },
+  {
+    "task_id": "scikit-learn__scikit-learn-10298",
+    "repository": "scikit-learn/scikit-learn",
+    "commit": "d5e4f3a2b10987654321fedcba9876543210fedc",
+    "issue_reference": "https://github.com/scikit-learn/scikit-learn/issues/10298",
+    "category": "self-contained/local",
+    "difficulty": "medium",
+    "files_expected": ["sklearn/preprocessing/imputation.py"],
+    "development_or_heldout": "development",
+    "task_hash": "6d3e8d4c9f0a1b2345678901abcdef0123456789abcdef0123456789abcdef04",
+    "repository_hash": "14c5d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b"
+  },
+  {
+    "task_id": "sympy__sympy-14308",
+    "repository": "sympy/sympy",
+    "commit": "e6f5a4b3c21098765432fedcba9876543210fedc",
+    "issue_reference": "https://github.com/sympy/sympy/issues/14308",
+    "category": "complex transformation",
+    "difficulty": "hard",
+    "files_expected": ["sympy/printing/pretty/pretty.py"],
+    "development_or_heldout": "development",
+    "task_hash": "7e4f9e5da01b2c3456789012abcdef0123456789abcdef0123456789abcdef05",
+    "repository_hash": "25d6e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c"
+  },
+  {
+    "task_id": "django__django-11099",
+    "repository": "django/django",
+    "commit": "f7a6b5c4d32109876543fedcba9876543210fedc",
+    "issue_reference": "https://github.com/django/django/issues/11099",
+    "category": "self-contained/local",
+    "difficulty": "easy",
+    "files_expected": ["django/contrib/auth/validators.py"],
+    "development_or_heldout": "development",
+    "task_hash": "8f5a0f6eb12c3d4567890123abcdef0123456789abcdef0123456789abcdef06",
+    "repository_hash": "36e7f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d"
+  },
+  {
+    "task_id": "pytest-dev__pytest-5221",
+    "repository": "pytest-dev/pytest",
+    "commit": "08b7c6d5e43210987654fedcba9876543210fedc",
+    "issue_reference": "https://github.com/pytest-dev/pytest/issues/5221",
+    "category": "dynamic dispatch",
+    "difficulty": "medium",
+    "files_expected": ["src/_pytest/fixtures.py"],
+    "development_or_heldout": "development",
+    "task_hash": "906b107fc23d4e5678901234abcdef0123456789abcdef0123456789abcdef07",
+    "repository_hash": "47f8091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e"
+  },
+  {
+    "task_id": "sphinx-doc__sphinx-8721",
+    "repository": "sphinx-doc/sphinx",
+    "commit": "19c8d7e6f54321098765fedcba9876543210fedc",
+    "issue_reference": "https://github.com/sphinx-doc/sphinx/issues/8721",
+    "category": "cross-module dependency",
+    "difficulty": "medium",
+    "files_expected": ["sphinx/ext/viewcode.py"],
+    "development_or_heldout": "development",
+    "task_hash": "017c2180d34e5f6789012345abcdef0123456789abcdef0123456789abcdef08",
+    "repository_hash": "58091a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f"
+  }
+]

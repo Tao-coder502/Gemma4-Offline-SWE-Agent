@@ -1,0 +1,39 @@
+{
+  "experiment_id": "exp_v50_frozen_baseline",
+  "timestamp": "2026-10-01T01:20:36.324556+00:00",
+  "git_commit": "a5736c980278e60b3c5a8e2712cf28e68df56213",
+  "status": "PRE_REGISTERED",
+  "model": "gemma-4-31b-it-qat-w4a16-ct",
+  "model_hash": "gemma-4-31b-it-qat-w4a16-ct-qat-w4a16",
+  "agent_config": "configs/phase5/v5_0_final/agent.yaml",
+  "agent_config_hash": "c994bda2f443f6cb719b20793b2f26e62117bf4ff0a6d8408f036d774a4b28f1",
+  "prompt": "prompts/system_v5_optimized.md",
+  "prompt_hash": "ab5a59b02e830772b9967012e9051a6c7c83442ed83612b39e0b36ff3621bca6",
+  "sampling": "configs/phase5/v5_0_final/sampling.yaml",
+  "sampling_hash": "298ba75a74286937994430731d4d1b0267eabecfbcde16e06ad5408414269e6d",
+  "tool_registry": [
+    "edit_file",
+    "get_code_neighbors",
+    "get_code_subgraph",
+    "get_status",
+    "read_file",
+    "run_command",
+    "search_similar_code",
+    "submit_patch",
+    "write_file"
+  ],
+  "tool_registry_hash": "c2a708a27cae2b8095f4bfc79115ad5748a727a603c725a7d476210418517ef8",
+  "tool_budget": 30,
+  "repair_budget": 3,
+  "task_manifest": "data/development/task_manifest.json",
+  "task_manifest_hash": "fcc4e3487f042d4f12e573985dcb89df64fa423f570b8b790e364e130357c27f",
+  "environment_information": {
+    "python_version": "3.13.1",
+    "os_platform": "Windows-11-10.0.26200-SP0",
+    "container_isolation": "offline / air-gapped",
+    "working_directory": "C:\\Users\\DELL\\Downloads\\Gemma4-Offline-SWE-Agent"
+  },
+  "evaluation_script_version": "1.0.0",
+  "analyzer_version": "1.0.0",
+  "random_seed": 42
+}

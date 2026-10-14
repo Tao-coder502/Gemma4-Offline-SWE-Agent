@@ -73,7 +73,71 @@ class TaskRecord:
         self._patch_plan_set: bool = False           # True when INTERNAL STATE Patch Plan was written
         self._tdr_failure_classes: list[str] = []   # e.g. ["PATCH_DEFECT", "PRE_EXISTING"]
 
+        # Stage-level pipeline outcomes
+        self.localization_success: bool | None = None
+        self.root_cause_success: bool | None = None
+        self.patch_generation_success: bool | None = None
+        self.test_success: bool | None = None
+        self.repair_success: str | bool | None = "NOT_ATTEMPTED"
+        self.final_success: bool | None = None
+
+        # Failure taxonomy (2D: stage x category)
+        self.failure_stage: str | None = None
+        self.failure_category: str | None = None
+        self.failure_evidence: str | None = None
+
+        # Graph utility tracking
+        self.graph_triggered: bool = False
+        self.graph_trigger_reason: str | None = None
+        self.graph_operations: list[str] = []
+        self.graph_result_used: bool = False
+        self.graph_utility: str = "NOT_RECORDED"  # USEFUL | NEUTRAL | UNNECESSARY | NOT_RECORDED
+
     # ── Recording helpers ────────────────────────────────────────────────────
+
+    def record_stage_outcome(
+        self,
+        localization: bool | None = None,
+        root_cause: bool | None = None,
+        patch_generation: bool | None = None,
+        test_validation: bool | None = None,
+        repair: str | bool | None = None,
+        final_success: bool | None = None,
+    ) -> None:
+        """Record explicit stage-level pipeline outcomes."""
+        if localization is not None:
+            self.localization_success = localization
+        if root_cause is not None:
+            self.root_cause_success = root_cause
+        if patch_generation is not None:
+            self.patch_generation_success = patch_generation
+        if test_validation is not None:
+            self.test_success = test_validation
+        if repair is not None:
+            self.repair_success = repair
+        if final_success is not None:
+            self.final_success = final_success
+
+    def record_failure_taxonomy(self, stage: str, category: str, evidence: str = "") -> None:
+        """Record 2D failure taxonomy: failure_stage x failure_category."""
+        self.failure_stage = stage
+        self.failure_category = category
+        self.failure_evidence = evidence
+
+    def record_graph_trigger(
+        self,
+        reason: str,
+        operations: list[str] | None = None,
+        result_used: bool = True,
+        utility: str = "USEFUL",
+    ) -> None:
+        """Record graph triggering rationale and utility."""
+        self.graph_triggered = True
+        self.graph_trigger_reason = reason
+        if operations:
+            self.graph_operations.extend(operations)
+        self.graph_result_used = result_used
+        self.graph_utility = utility
 
     def record_tool_call(self, tool_name: str) -> None:
         """Record any tool invocation."""
@@ -82,6 +146,9 @@ class TaskRecord:
             self._semantic_searches += 1
         elif tool_name in ("get_code_neighbors", "get_code_subgraph"):
             self._graph_calls += 1
+            self.graph_triggered = True
+            if tool_name not in self.graph_operations:
+                self.graph_operations.append(tool_name)
 
     def record_semantic_search(self) -> None:
         """Increment count of semantic similarity searches."""
@@ -90,6 +157,9 @@ class TaskRecord:
     def record_graph_call(self, graph_tool: str = "get_code_neighbors") -> None:
         """Increment count of graph tool calls."""
         self._graph_calls += 1
+        self.graph_triggered = True
+        if graph_tool not in self.graph_operations:
+            self.graph_operations.append(graph_tool)
 
     def record_symbol_inspected(self, symbol: str) -> None:
         """Record a symbol investigated via code-graph or AST reading."""
@@ -148,6 +218,7 @@ class TaskRecord:
         self.outcome = outcome
         self.failure_reason = failure_reason
         self.notes = notes
+        self.final_success = (outcome == "success")
 
     # ── Serialise ────────────────────────────────────────────────────────────
 
@@ -160,6 +231,23 @@ class TaskRecord:
             "outcome":           self.outcome,
             "failure_reason":    self.failure_reason,
             "notes":             self.notes,
+            # ── Stage-level pipeline outcomes ─────────────────────────────────
+            "localization_success":     self.localization_success,
+            "root_cause_success":       self.root_cause_success,
+            "patch_generation_success": self.patch_generation_success,
+            "test_success":             self.test_success,
+            "repair_success":           self.repair_success,
+            "final_success":            self.final_success,
+            # ── Failure taxonomy (2D: stage x category) ──────────────────────
+            "failure_stage":            self.failure_stage,
+            "failure_category":         self.failure_category,
+            "failure_evidence":         self.failure_evidence,
+            # ── Graph utility metrics ─────────────────────────────────────────
+            "graph_triggered":          self.graph_triggered,
+            "graph_trigger_reason":     self.graph_trigger_reason,
+            "graph_operations":         self.graph_operations,
+            "graph_result_used":        self.graph_result_used,
+            "graph_utility":            self.graph_utility,
             # ── Localization metrics ──────────────────────────────────────────
             "semantic_searches":     self._semantic_searches,
             "semantic_search_count": self._semantic_searches,   # alias for compatibility

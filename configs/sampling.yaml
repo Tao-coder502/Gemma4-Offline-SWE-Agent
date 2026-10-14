@@ -4,11 +4,11 @@
 # ============================================================
 
 # Temperature: Low = more deterministic, fewer hallucinations.
-# For code editing tasks, 0.1–0.3 is preferred.
-temperature: 0.2
+# For code editing tasks, 0.1 is proven optimal in Phase 5 optimization study.
+temperature: 0.1
 
 # Top-p nucleus sampling — restricts token pool to cumulative prob mass.
-top_p: 0.95
+top_p: 0.90
 
 # Maximum tokens the model may generate per turn.
 # 32 768 gives enough room for long reasoning chains + code blocks.

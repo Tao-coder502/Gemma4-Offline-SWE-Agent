@@ -1,0 +1,9 @@
+Task,Category,A,B,C,D,Localization,Root Cause,Patch,Validation,Repair,Primary Observed Mechanism
+psf__requests-2148,caller-callee dependency,SUCCESS,SUCCESS,SUCCESS,SUCCESS,SUCCESS (All),SUCCESS (All),"SUCCESS (A,B,C,D)",PASS (All),NOT_ATTEMPTED,Local leaf defect solved with minimal edits; graph bypassed in Modes C & D
+pallets__flask-4045,self-contained/local,SUCCESS,SUCCESS,SUCCESS,SUCCESS,SUCCESS (All),SUCCESS (All),"SUCCESS (A,B,C,D)",PASS (All),NOT_ATTEMPTED,Local leaf defect solved with minimal edits; graph bypassed in Modes C & D
+matplotlib__matplotlib-23456,caller-callee dependency,FAILURE,SUCCESS,SUCCESS,SUCCESS,"FAIL (A) / PASS (B,C,D)","FAIL (A) / PASS (B,C,D)",FAIL (A),FAIL (A),NOT_ATTEMPTED,Graph neighbors exposed Axes3D caller contract omitted in Mode A
+scikit-learn__scikit-learn-10298,self-contained/local,SUCCESS,SUCCESS,SUCCESS,SUCCESS,SUCCESS (All),SUCCESS (All),"SUCCESS (A,B,C,D)",PASS (All),NOT_ATTEMPTED,Self-contained array transform; graph bypassed in Modes C & D
+sympy__sympy-14308,complex transformation,FAILURE,FAILURE,FAILURE,SUCCESS,SUCCESS (All),SUCCESS (All),FAIL (C-init) / PASS (D-repaired),"FAIL (A,B,C) / PASS (D)",SUCCESS (Cycle 1),2D pretty-print layout defect repaired on cycle 1 by Mode D TDR loop
+django__django-11099,self-contained/local,SUCCESS,SUCCESS,SUCCESS,SUCCESS,SUCCESS (All),SUCCESS (All),"SUCCESS (A,B,C,D)",PASS (All),NOT_ATTEMPTED,Local leaf defect solved with minimal edits; graph bypassed in Modes C & D
+pytest-dev__pytest-5221,dynamic dispatch,FAILURE,SUCCESS,SUCCESS,SUCCESS,"FAIL (A) / PASS (B,C,D)","FAIL (A) / PASS (B,C,D)",FAIL (A),FAIL (A),NOT_ATTEMPTED,Graph query localized dynamic fixture scope dispatch where semantic search failed
+sphinx-doc__sphinx-8721,cross-module dependency,SUCCESS,FAILURE,SUCCESS,SUCCESS,SUCCESS (All),SUCCESS (All),"SUCCESS (A,B,C,D)",FAIL (B),NOT_ATTEMPTED,Modular leaf defect; mandatory graph traversal in Mode B exhausted tool budget

@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/google/adk-python/refs/heads/main/src/google/adk/agents/config_schemas/AgentConfig.json
+# ============================================================
+# Gemma 4 Offline SWE Agent — Phase 4 / Experiment Mode C2
+# Competition: Google - The Gemma 4 Developer Agent Competition
+# ============================================================
+# Mode C2: Adaptive Graph + Test-Driven Repair
+# Status: PLANNED / NOT_RUN (Modular component isolation)
+# ============================================================
+
+name: gemma4_swe_agent_mode_c2
+
+model: gemma-4-31b-it-qat-w4a16-ct
+
+description: >
+  Phase 4 / Mode C2 — Adaptive Graph + Test-Driven Repair.
+  Combines confidence-gated adaptive code-graph reasoning with a formal
+  multi-cycle test-driven repair loop (max 3 cycles), but without the mandatory
+  11-slot internal state tracking block. Used to isolate the contribution of
+  iterative repair independently of structured state formatting.
+  No external APIs. No internet.
+
+instruction: !include prompts/system_mode_c2.md
+
+# ── Tool registry (Mode C2: 9 tools) ─────────────────────────────────────────
+tools:
+  - run_command          # Shell commands: ls, grep, rg, git, pytest, python, etc.
+  - read_file            # Read file content, optionally with a line range.
+  - edit_file            # Make a targeted in-place replacement in a source file.
+  - write_file           # Write a new file (use /tmp for scratch; not /workspace).
+  - get_status           # Inspect the remaining tool-call budget and patch state.
+  - submit_patch         # Capture the git diff and submit as the final answer.
+  - search_similar_code  # Semantic similarity search over the repository codebase.
+  - get_code_neighbors   # Query incoming/outgoing graph neighbors (callers, callees, usages).
+  - get_code_subgraph    # Extract local relational subgraph around a symbol or module.
+
+generate_content_config: !include configs/sampling.yaml

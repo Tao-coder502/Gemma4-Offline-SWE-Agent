@@ -1,0 +1,33 @@
+task_id,mode,graph_call_count,graph_operations,trigger_reason
+psf__requests-2148,mode_a,0,none,Bypassed: Graph tools strictly prohibited in Mode A
+pallets__flask-4045,mode_a,0,none,Bypassed: Graph tools strictly prohibited in Mode A
+matplotlib__matplotlib-23456,mode_a,0,none,Bypassed: Graph tools strictly prohibited in Mode A
+scikit-learn__scikit-learn-10298,mode_a,0,none,Bypassed: Graph tools strictly prohibited in Mode A
+sympy__sympy-14308,mode_a,0,none,Bypassed: Graph tools strictly prohibited in Mode A
+django__django-11099,mode_a,0,none,Bypassed: Graph tools strictly prohibited in Mode A
+pytest-dev__pytest-5221,mode_a,0,none,Bypassed: Graph tools strictly prohibited in Mode A
+sphinx-doc__sphinx-8721,mode_a,0,none,Bypassed: Graph tools strictly prohibited in Mode A
+psf__requests-2148,mode_b,3,get_code_neighbors; get_code_neighbors; get_code_subgraph,"Mandatory: Unconditional inspection of candidate symbols (HTTPResponse.read, Response.iter_content)"
+pallets__flask-4045,mode_b,2,get_code_neighbors; get_code_neighbors,"Mandatory: Unconditional inspection of candidate symbols (Blueprint.__init__, Blueprint.register)"
+matplotlib__matplotlib-23456,mode_b,3,get_code_neighbors,"Mandatory: Unconditional inspection of candidate symbols (Axes.set_box_aspect, Axes3D.set_box_aspect)"
+scikit-learn__scikit-learn-10298,mode_b,2,get_code_neighbors,"Mandatory: Unconditional inspection of candidate symbols (Imputer.transform, Imputer.fit)"
+sympy__sympy-14308,mode_b,5,get_code_subgraph; get_code_neighbors; get_code_subgraph,"Mandatory: Unconditional inspection of candidate symbols (pretty_print, Printer._print, Expr, Pow)"
+django__django-11099,mode_b,2,get_code_neighbors,"Mandatory: Unconditional inspection of candidate symbols (ASCIIUsernameValidator, UnicodeUsernameValidator)"
+pytest-dev__pytest-5221,mode_b,3,get_code_neighbors; get_code_subgraph,"Mandatory: Unconditional inspection of candidate symbols (FixtureDef, FixtureManager.getfixturedefs, pytest_fixture_setup)"
+sphinx-doc__sphinx-8721,mode_b,4,get_code_neighbors; get_code_subgraph,"Mandatory: Unconditional inspection of candidate symbols (viewcode_follow_alias, ModuleAnalyzer, find_tags)"
+psf__requests-2148,mode_c,0,none,"Bypassed: Isolated leaf defect, high confidence (graph skipped)"
+pallets__flask-4045,mode_c,0,none,"Bypassed: Isolated leaf defect, high confidence (graph skipped)"
+matplotlib__matplotlib-23456,mode_c,1,get_code_neighbors,Adaptive: Caller contract ambiguity across 2D Axes and 3D projection classes
+scikit-learn__scikit-learn-10298,mode_c,0,none,"Bypassed: Self-contained transformer logic, high confidence (graph skipped)"
+sympy__sympy-14308,mode_c,1,get_code_neighbors,Adaptive: Caller check on Expr print visitors and Pow printing
+django__django-11099,mode_c,0,none,"Bypassed: Isolated leaf defect, high confidence (graph skipped)"
+pytest-dev__pytest-5221,mode_c,1,get_code_neighbors,Adaptive: Indirection in fixture manager dynamic scope lookup
+sphinx-doc__sphinx-8721,mode_c,0,none,"Bypassed: Self-contained package anchor fix, high confidence (graph skipped)"
+psf__requests-2148,mode_d,0,none,"Bypassed: Isolated leaf defect, high confidence (graph skipped)"
+pallets__flask-4045,mode_d,0,none,"Bypassed: Isolated leaf defect, high confidence (graph skipped)"
+matplotlib__matplotlib-23456,mode_d,1,get_code_neighbors,Adaptive: Caller contract ambiguity across 2D Axes and 3D projection classes
+scikit-learn__scikit-learn-10298,mode_d,0,none,"Bypassed: Self-contained transformer logic, high confidence (graph skipped)"
+sympy__sympy-14308,mode_d,1,get_code_neighbors,Adaptive: Caller check on Expr print visitors and Pow printing
+django__django-11099,mode_d,0,none,"Bypassed: Isolated leaf defect, high confidence (graph skipped)"
+pytest-dev__pytest-5221,mode_d,1,get_code_neighbors,Adaptive: Indirection in fixture manager dynamic scope lookup
+sphinx-doc__sphinx-8721,mode_d,0,none,"Bypassed: Self-contained package anchor fix, high confidence (graph skipped)"
