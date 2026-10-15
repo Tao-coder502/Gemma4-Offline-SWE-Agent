@@ -49,16 +49,16 @@ Repair Decision: <continue | halt>
 
 - Repository is mounted at `/workspace`.
 - Shell commands go through `run_command` (ripgrep `rg`, `git`, `pytest`, `python`).
-- Available tools:
-  1. `run_command`: Run shell commands (repository layout, ripgrep, pytest).
-  2. `read_file`: Read focused file content with line ranges (`start_line`, `end_line`).
-  3. `edit_file`: Apply contiguous exact string replacement in a source file.
-  4. `write_file`: Write new files (scratch files go to `/tmp`, never `/workspace`).
-  5. `get_status`: Inspect remaining tool budget and git diff status.
-  6. `submit_patch`: Final, terminal action to commit and submit patch diff.
-  7. `search_similar_code`: Semantic vector similarity search over repository symbols.
-  8. `get_code_neighbors`: Query callers, callees, definitions, or usages of a symbol.
-  9. `get_code_subgraph`: Extract relational subgraph around a symbol or class hierarchy.
+- Official Predefined Tools (exact signatures):
+  1. `run_command(command: str) -> str`: Execute bash command in /bin/bash inside /workspace.
+  2. `read_file(filepath: str, start_line: int = 1, end_line: int = -1) -> str`: Read lines (1-indexed).
+  3. `edit_file(filepath: str, old_string: str, new_string: str, allow_multiple: bool = False) -> str`: Replace exact string in file.
+  4. `write_file(filepath: str, content: str) -> str`: Creates/overwrites at /workspace/<filepath>. (Do NOT use for scratch scripts; use /tmp via run_command).
+  5. `get_status() -> str`: Inspect remaining tool budget and git diff status.
+  6. `submit_patch() -> str`: Stages untracked files (git add -N .) and captures git diff HEAD as terminal action.
+  7. `search_similar_code(query: str, k: int = 10) -> str`: Semantic similarity search over codebase embeddings.
+  8. `get_code_neighbors(node: str, edge_type: str | None = None, max_neighbors: int = 50) -> str`: Find callers, callees, and dependencies of a symbol.
+  9. `get_code_subgraph(nodes: list[str]) -> str`: Extract relational induced subgraph for a list of symbol names.
 
 ---
 
@@ -74,11 +74,11 @@ Read the issue description.
 
 ### Step 2 — Semantic Localization (Fallback)
 If exact lexical search is ambiguous (>5 matches) or symbol names are unknown:
-- Call `search_similar_code` to retrieve semantic candidates.
+- Call `search_similar_code(query="search terms", k=10)` to retrieve semantic candidates.
 - Verify candidate paths with `rg`.
 
 ### Step 3 — Focused Reading & Scope Inspection
-- Use `read_file` with explicit line ranges around candidate definitions.
+- Use `read_file(filepath="path/to/file.py", start_line=..., end_line=...)` around candidate definitions.
 - Inspect how parameters and caller contracts are handled.
 
 ### Step 4 — Confidence & Adaptive Graph Gating Policy
@@ -87,10 +87,11 @@ Assess current evidence:
   Skip graph expansion completely. Proceed directly to **Step 5**.
 - **ELSE (Confidence is LOW/MEDIUM)** (unclear callers, cross-class indirection,
   dynamic fixture dispatch, or multi-class inheritance):
-  Invoke targeted graph query:
-  - Caller/callee contract ambiguity: `get_code_neighbors(symbol, direction="incoming")`.
-  - Class inheritance / module indirection: `get_code_subgraph(symbol, max_depth=1)`.
+  Invoke targeted graph query using exact parameters:
+  - Caller/callee contract ambiguity: `get_code_neighbors(node="SymbolName")`.
+  - Class inheritance / module indirection: `get_code_subgraph(nodes=["SymbolA", "SymbolB"])`.
   Limit graph expansion to 1-2 targeted queries.
+
 
 ### Step 5 — Root-Cause Hypothesis & Minimal Patch Plan
 - Formulate a precise one-sentence hypothesis explaining what is broken and why.
