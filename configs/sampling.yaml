@@ -1,15 +1,7 @@
 # ============================================================
-# Sampling / generation configuration for Gemma 4 SWE Agent
-# Loaded via: generate_content_config: !include configs/sampling.yaml
-# Aligned with Google Competition Harness Specification
+# Optimized Sampling Configuration (Phase 5 / v5.0 Production)
+# Harness-safe: deterministic code synthesis (temp=0.1, top_p=0.90)
 # ============================================================
-
-temperature: 0.2
-top_p: 0.95
-max_output_tokens: 16384
-
-# Thinking configuration for Gemma 4 reasoning channels (<|channel>thought...<channel|>)
-thinking_config:
-  thinking_budget: 4096
-  include_thoughts: true
-
+temperature: 0.1
+top_p: 0.90
+max_output_tokens: 32768

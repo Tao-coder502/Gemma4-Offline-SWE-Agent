@@ -102,22 +102,30 @@ Assess current evidence:
     relative to operands before editing to avoid layout misalignment.
 
 ### Step 6 — Targeted Pre-Patch Validation
-Run the targeted test command before editing:
+Run a focused, targeted test command before editing:
 ```
 run_command: pytest <test_file.py> -k <test_name>
 ```
-Confirm reproduction of the defect (or understand baseline test behavior).
+- **Timeout Guard**: NEVER run naked `pytest` across the entire repository — it will timeout and fail.
+- If the specific test file is unknown, locate candidate tests with `run_command: rg -n "def test_" tests/`.
+- If no targeted test can be identified, do NOT run full test suites. Proceed directly to Step 7.
 
-### Step 7 — Apply Minimal Patch
+### Step 7 — Apply Minimal Patch & Edit Recovery
 Apply the surgical patch using `edit_file`.
+- **Surrounding Context**: Always include 2–3 lines of unchanged context above and below the target to guarantee an exact, unique match.
+- **Whitespace Recovery Policy**: If `edit_file` returns `Target block not found`, NEVER guess indentation. Immediately call `read_file` with explicit line numbers to inspect exact whitespace (tabs vs spaces) and retry with verified context.
 
 ### Step 8 — Post-Patch Validation & Early Stopping Policy
 Run the exact targeted test command:
 ```
 run_command: pytest <test_file.py> -k <test_name>
 ```
+- **Syntax Check**: If no targeted test exists, verify syntax cleanly:
+  ```
+  run_command: python -m py_compile <modified_file.py>
+  ```
 - **IF tests PASS**:
-  - Check `get_status` to ensure clean, minimal diff.
+  - Check `get_status` to ensure a clean, minimal diff containing ONLY modified source files.
   - **Early Stopping Rule**: Do NOT run speculative extra searches or commands.
     Immediately call `submit_patch` as the terminal action. Done!
 - **ELSE (tests FAIL)**:
@@ -143,9 +151,12 @@ If tests fail post-patch:
 
 ## Hard Rules
 
-1. **Adaptive Graph Rule**: Never call graph tools on obvious self-contained bugs.
-2. **Read Before Edit**: Never call `edit_file` on code you have not inspected.
-3. **Patch Minimality**: Keep diffs surgical ($\le 20$ lines target).
-4. **Early Stopping**: When tests pass and diff is verified, stop immediately and submit.
-5. **Offline Safety**: Zero internet or external API calls.
-6. **Submission Finality**: `submit_patch` must be executed exactly once at the end.
+1. **Zero Test Pollution**: NEVER modify, create, or commit test files in `/workspace` (`tests/`, `test_*.py`). The submission patch must strictly modify source code in the package. Any reproduction scratch scripts MUST be placed in `/tmp` and never committed.
+2. **No Naked Pytest**: Never run un-scoped `pytest` without a target file; full test suites exceed competition timeouts.
+3. **Adaptive Graph Rule**: Never call graph tools on obvious self-contained bugs.
+4. **Read Before Edit**: Never call `edit_file` on code you have not inspected.
+5. **Patch Minimality**: Keep diffs surgical ($\le 20$ lines target). Never reformat surrounding code.
+6. **Early Stopping**: When tests pass and diff is verified, stop immediately and call `submit_patch`.
+7. **Offline Safety**: Zero internet or external API calls.
+8. **Submission Finality**: `submit_patch` must be executed exactly once as the final action.
+
