@@ -92,9 +92,10 @@ Assess current evidence:
   - Class inheritance / module indirection: `get_code_subgraph(symbol, max_depth=1)`.
   Limit graph expansion to 1-2 targeted queries.
 
-### Step 5 — Root-Cause Hypothesis & Patch Plan
+### Step 5 — Root-Cause Hypothesis & Minimal Patch Plan
 - Formulate a precise one-sentence hypothesis explaining what is broken and why.
 - Formulate a **Minimal Patch Plan**: identify exact file, line range, and replacement.
+- **Multi-File Coordination**: If a defect spans an interface definition and an implementation (e.g. base class and concrete subclass), modify at most 2 files in a strictly correlated manner. Maintain surgical minimality across both.
 - **Patch Minimality Guard**:
   - Touch strictly the lines necessary to resolve the defect.
   - Never reformat unaffected surrounding lines, re-indent blocks, or alter comments.
@@ -125,7 +126,10 @@ run_command: pytest <test_file.py> -k <test_name>
   run_command: python -m py_compile <modified_file.py>
   ```
 - **IF tests PASS**:
-  - Check `get_status` to ensure a clean, minimal diff containing ONLY modified source files.
+  - **Pre-Submission Invariant Check**: Run `run_command: git diff --stat` and verify:
+    1. Lines changed $> 0$ (if lines changed $== 0$, edit was NOT applied—do NOT submit; diagnose why `edit_file` failed).
+    2. Exactly zero test files modified (`tests/`, `test_*.py`).
+    3. Total lines changed $\le 30$.
   - **Early Stopping Rule**: Do NOT run speculative extra searches or commands.
     Immediately call `submit_patch` as the terminal action. Done!
 - **ELSE (tests FAIL)**:
@@ -139,13 +143,17 @@ If tests fail post-patch:
    - `PRE_EXISTING`: Failure existed prior to patch (unrelated test failure).
    - `BUDGET_LOW`: Remaining tool budget is $< 15\%$.
 3. If `PATCH_DEFECT` and `Repair Cycle < 3`:
-   - Identify the exact mismatch in assertion values.
-   - Increment `Repair Cycle`.
-   - Apply targeted fix with `edit_file`.
-   - Re-run targeted test.
+   - **Hypothesis Invalidation & Backtracking Protocol**:
+     If Repair Cycle 1 fails with an identical error or causes regressions in previously passing tests, the root-cause hypothesis is INVALID. Do NOT continue editing the same file. Set `Confidence = low`, erase Candidate File, and backtrack to Step 2 to locate alternative callers/modules.
+   - Otherwise, if failure is a localized assertion mismatch:
+     - Identify the exact mismatch in assertion values.
+     - Increment `Repair Cycle`.
+     - Apply targeted fix with `edit_file`.
+     - Re-run targeted test.
 4. If `Repair Cycle >= 3` or `BUDGET_LOW`:
    - Halt repair loop (`Repair Decision = halt`).
    - Call `submit_patch` to preserve best available attempt.
+
 
 ---
 

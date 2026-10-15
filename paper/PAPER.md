@@ -154,6 +154,15 @@ $$\text{Decision} = \begin{cases}
 * **High-Confidence Bypass Condition**: When an exact traceback isolates a leaf function (e.g., an off-by-one check in `requests/models.py`), the modification does not alter function signatures or return types. Graph tools are completely bypassed ($0$ calls).
 * **Expansion Condition**: On `pytest-dev__pytest-5221`, the agent queried `get_code_neighbors("FixtureRequest")` to reveal the caller relationship between test fixture evaluation and dynamic execution hooks, identifying the exact registration site in under 2 graph calls.
 
+### 6.1 Implementation Tradeoff: Zero-Dependency Syntactic Probe vs. Language Server Protocol (LSP)
+
+A key architectural design question in autonomous SWE agents is whether to deploy an external Language Server (e.g., `pyright`, `tree-sitter`, or `rust-analyzer`) or a native syntactic probe. In an air-gapped competition container with strict memory ceilings and execution timeouts, full LSP daemons introduce severe penalties:
+1. **Memory Footprint**: Background language servers maintain extensive in-memory symbol indices and type caches, consuming $2\text{--}4\text{ GB}$ of RAM—directly competing with the 31B quantized LLM runtime for host memory.
+2. **Cold-Start Latency**: Full workspace indexing on large repositories (e.g., Django, SymPy) requires $15\text{--}45\text{s}$ before serving the first query.
+3. **Hermetic Dependency Overhead**: External binary servers violate minimal air-gapped distribution requirements.
+
+To circumvent these operational bottlenecks, our code-graph subsystem utilizes a zero-dependency, on-demand AST syntactic probe implemented directly via Python's standard `ast` module. The probe walks syntax trees on demand, resolving caller/callee contracts and class hierarchies in $< 50\text{ms}$ with negligible memory overhead. While this design deliberately trades away cross-module type inference and dynamic attribute resolution, it guarantees sub-second execution latency, zero memory contention, and complete air-gapped container stability.
+
 ---
 
 ## 7. Test-Driven Repair (TDR) Loop
