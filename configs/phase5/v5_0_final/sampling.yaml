@@ -1,7 +1,11 @@
 # ============================================================
 # Optimized Sampling Configuration (Phase 5 / v5.0 Final)
-# Harness-safe: thinking_config removed (not supported by vLLM).
+# Aligned with Google Competition Harness Specification
 # ============================================================
 temperature: 0.2
 top_p: 0.95
-max_output_tokens: 32768
+max_output_tokens: 16384
+thinking_config:
+  thinking_budget: 4096
+  include_thoughts: true
+
