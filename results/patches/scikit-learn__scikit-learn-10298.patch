@@ -1,0 +1,11 @@
+--- a/sklearn/preprocessing/imputation.py
++++ b/sklearn/preprocessing/imputation.py
+@@ -158,6 +158,8 @@ class Imputer(BaseEstimator, TransformerMixin):
+         if sparse.issparse(X):
+             self.statistics_ = self._sparse_fit(X,
+                                                 self.strategy,
+                                                 self.missing_values,
+                                                 self.axis)
++            if hasattr(X, "dtype"):
++                self.statistics_ = self.statistics_.astype(X.dtype)
+             return self

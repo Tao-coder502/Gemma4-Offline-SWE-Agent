@@ -1,0 +1,11 @@
+--- a/sphinx/ext/viewcode.py
++++ b/sphinx/ext/viewcode.py
+@@ -182,6 +182,8 @@ def collect_pages(app: Sphinx) -> Generator[Tuple[str, Dict[str, Any], str], No
+         if not modname:
+             continue
+         fullname = modname
++        if hasattr(app.builder, "name") and app.builder.name == "epub" and "." in modname:
++            fullname = modname.replace(".", "/")
+         entry = (OUTPUT_DIRNAME + '/' + fullname.replace('.', '/'),
+                  context, 'page.html')
+         yield entry

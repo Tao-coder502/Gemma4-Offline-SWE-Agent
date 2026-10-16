@@ -1,0 +1,10 @@
+--- a/src/_pytest/fixtures.py
++++ b/src/_pytest/fixtures.py
+@@ -1245,6 +1245,9 @@ class FixtureManager:
+                 fixturedefs = self.getfixturedefs(argname, parentnode)
+                 if fixturedefs:
+                     return fixturedefs
++        for fixturedef in self._arg2fixturedefs.get(argname, []):
++            if fixturedef.scope == "session":
++                return [fixturedef]
+         return None

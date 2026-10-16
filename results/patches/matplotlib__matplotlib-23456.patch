@@ -1,0 +1,11 @@
+--- a/lib/matplotlib/axes/_base.py
++++ b/lib/matplotlib/axes/_base.py
+@@ -1485,7 +1485,7 @@ class _AxesBase(martist.Artist):
+         if aspect == 'equal':
+             aspect = 1.0
+         elif isinstance(aspect, str):
+-            raise ValueError(f"Invalid box aspect: {aspect}")
++            raise ValueError(f"Invalid box aspect: {aspect!r}")
+
+         if aspect is not None:
+             aspect = float(aspect)

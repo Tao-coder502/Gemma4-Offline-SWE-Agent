@@ -1,0 +1,17 @@
+--- a/requests/models.py
++++ b/requests/models.py
+@@ -19,6 +19,7 @@ import collections
+ import datetime
++import socket
+
+ from io import BytesIO, UnsupportedOperation
+ from .hooks import default_hooks
+@@ -638,6 +639,8 @@ class Response(object):
+                     raise ChunkedEncodingError(e)
+                 except DecodeError as e:
+                     raise ContentDecodingError(e)
++                except socket.error as sockerr:
++                    raise ConnectionError(sockerr)
+                 except ReadTimeoutError as e:
+                     raise ConnectionError(e)
+             else:

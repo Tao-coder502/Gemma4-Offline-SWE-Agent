@@ -1,0 +1,10 @@
+--- a/sympy/printing/pretty/pretty.py
++++ b/sympy/printing/pretty/pretty.py
+@@ -957,7 +957,7 @@ class PrettyPrinter(Printer):
+         if e.is_negative:
+             b = self._print(Pow(b, -e))
+             return prettyForm(*b.left("/"))
+-        if b.height() > 1:
++        if b.height() > 1 and not getattr(b, "binding", None) == prettyForm.OPEN:
+             return self._print_Pow_matrix(b, e)
+         return prettyForm(*self._print(b).right(self._print(e)))

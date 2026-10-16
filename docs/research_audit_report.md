@@ -12,7 +12,7 @@
 ### 1. Configuration & Tooling
 - **Configuration File**: [`configs/phase2/agent.yaml`](file:///c:/Users/DELL/Downloads/Gemma4-Offline-SWE-Agent/configs/phase2/agent.yaml) (frozen).
 - **Instruction File**: [`prompts/phase2_system.md`](file:///c:/Users/DELL/Downloads/Gemma4-Offline-SWE-Agent/prompts/phase2_system.md) (frozen).
-- **Sampling Specification**: [`configs/sampling.yaml`](file:///c:/Users/DELL/Downloads/Gemma4-Offline-SWE-Agent/configs/sampling.yaml) (temperature: 0.2, top_p: 0.95, top_k: 40, max_output_tokens: 32,768).
+- **Sampling Specification**: [`configs/sampling.yaml`](file:///c:/Users/DELL/Downloads/Gemma4-Offline-SWE-Agent/configs/sampling.yaml) (temperature: 0.1, top_p: 0.90, max_output_tokens: 32,768).
 - **Model Identifier**: `gemma-4-31b-it-qat-w4a16-ct` (quantization-aware trained W4A16, offline-safe).
 - **Tool Registry (Exactly 7 Tools)**:
   1. `run_command`

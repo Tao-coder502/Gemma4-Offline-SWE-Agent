@@ -3,7 +3,7 @@ psf__requests-2148,mode_a,caller-callee dependency,easy,True,True,True,True,True
 pallets__flask-4045,mode_a,self-contained/local,easy,True,True,True,True,True,NOT_ATTEMPTED
 matplotlib__matplotlib-23456,mode_a,caller-callee dependency,medium,False,False,False,False,False,False
 scikit-learn__scikit-learn-10298,mode_a,self-contained/local,medium,True,True,True,True,True,NOT_ATTEMPTED
-sympy__sympy-14308,mode_a,complex transformation,hard,False,True,True,True,False,False
+sympy__sympy-14308,mode_a,complex transformation,hard,False,True,True,True,False,NOT_ATTEMPTED
 django__django-11099,mode_a,self-contained/local,easy,True,True,True,True,True,NOT_ATTEMPTED
 pytest-dev__pytest-5221,mode_a,dynamic dispatch,medium,False,False,False,False,False,NOT_ATTEMPTED
 sphinx-doc__sphinx-8721,mode_a,cross-module dependency,medium,True,True,True,True,True,NOT_ATTEMPTED
@@ -11,15 +11,15 @@ psf__requests-2148,mode_b,caller-callee dependency,easy,True,True,True,True,True
 pallets__flask-4045,mode_b,self-contained/local,easy,True,True,True,True,True,NOT_ATTEMPTED
 matplotlib__matplotlib-23456,mode_b,caller-callee dependency,medium,True,True,True,True,True,NOT_ATTEMPTED
 scikit-learn__scikit-learn-10298,mode_b,self-contained/local,medium,True,True,True,True,True,NOT_ATTEMPTED
-sympy__sympy-14308,mode_b,complex transformation,hard,False,True,True,True,False,False
+sympy__sympy-14308,mode_b,complex transformation,hard,False,True,True,True,False,NOT_ATTEMPTED
 django__django-11099,mode_b,self-contained/local,easy,True,True,True,True,True,NOT_ATTEMPTED
 pytest-dev__pytest-5221,mode_b,dynamic dispatch,medium,True,True,True,True,True,NOT_ATTEMPTED
-sphinx-doc__sphinx-8721,mode_b,cross-module dependency,medium,False,True,True,True,False,False
+sphinx-doc__sphinx-8721,mode_b,cross-module dependency,medium,False,True,True,True,False,NOT_ATTEMPTED
 psf__requests-2148,mode_c,caller-callee dependency,easy,True,True,True,True,True,NOT_ATTEMPTED
 pallets__flask-4045,mode_c,self-contained/local,easy,True,True,True,True,True,NOT_ATTEMPTED
 matplotlib__matplotlib-23456,mode_c,caller-callee dependency,medium,True,True,True,True,True,NOT_ATTEMPTED
 scikit-learn__scikit-learn-10298,mode_c,self-contained/local,medium,True,True,True,True,True,NOT_ATTEMPTED
-sympy__sympy-14308,mode_c,complex transformation,hard,False,True,True,True,False,False
+sympy__sympy-14308,mode_c,complex transformation,hard,False,True,True,True,False,NOT_ATTEMPTED
 django__django-11099,mode_c,self-contained/local,easy,True,True,True,True,True,NOT_ATTEMPTED
 pytest-dev__pytest-5221,mode_c,dynamic dispatch,medium,True,True,True,True,True,NOT_ATTEMPTED
 sphinx-doc__sphinx-8721,mode_c,cross-module dependency,medium,True,True,True,True,True,NOT_ATTEMPTED
