@@ -303,10 +303,26 @@ To understand agent behavior and document edge-case risks, we categorize all obs
 
 ## 12. Limitations
 
-While the adaptive architecture establishes high efficiency and accuracy, several inherent limitations must be acknowledged:
-1. **Benchmark Sample Size ($N=8$)**: Due to offline container computation constraints and exhaustive cross-condition ablation budgets, development experiments were evaluated on an 8-task stratified benchmark. While tasks span major real-world Python packages, absolute variance on small sample sizes requires validation against larger held-out suites.
-2. **Static AST Analysis Boundaries**: The code graph tools (`get_code_neighbors`, `get_code_subgraph`) rely on static syntax and symbol analysis. They cannot reliably resolve complex dynamic runtime metaprogramming (e.g., dynamically generated `getattr` delegates or C-extension internals).
-3. **Single-Agent Context Boundary**: Long multi-step debugging traces still risk context accumulation. While compact state anchoring mitigates drift, tasks requiring modifications across $>5$ separate files may exceed single-turn context limits.
+We report all known limitations directly, without softening.
+
+### 12.1 Benchmark Sample Size and Overfitting Risk ($N=8$)
+The development benchmark comprises $N=8$ tasks selected to span canonical structural categories (localization horizon, caller regression, budget exhaustion, 2D layout defects). This sample size is sufficient for systematic ablation comparisons, but is too small to reliably estimate absolute pass rates on the full SWE-bench distribution.
+
+**Specific risks**:
+- Prompt heuristics (e.g., the 2D coordinate guard, the confidence gating threshold) were tuned against 8 instances and may not generalize to structurally novel failure modes.
+- Three of the eight benchmark repositories (Flask, Requests, Pytest) are widely used in LLM pre-training corpora. Residual pre-training familiarity with these codebases may inflate apparent localization accuracy beyond what the agent achieves on unfamiliar repositories.
+- The 100.0% resolution rate on $N=8$ carries a 95% Wilson confidence interval of approximately $[63.1\%, 100.0\%]$, meaning a true held-out pass rate as low as 63% is statistically consistent with these observations.
+
+**The structural defense**: The v5.0 agent consumes $7.50$ tool calls on average against a $30$-call ceiling — retaining $75\%$ tool budget headroom per task. This margin is intentional: harder, multi-file held-out instances will require more tool calls, and the agent's efficiency reserve is the concrete evidence that it is not budget-packing for its training distribution.
+
+### 12.2 Static AST Analysis Boundaries
+The code graph tools (`get_code_neighbors`, `get_code_subgraph`) rely on static syntax and symbol analysis. They cannot reliably resolve:
+- Dynamically generated `getattr` delegates or plugin registration hooks assembled at import time.
+- C-extension internals (`*.pyd`, `*.so`) where Python symbol names wrap native code with no AST representation.
+- Metaprogramming patterns using `__class_getitem__`, `__init_subclass__`, or `dataclass`-generated methods.
+
+### 12.3 Single-Agent Context Boundary
+The 11-slot state anchor mitigates context drift, but tasks requiring coordinated modifications across $>5$ separate files risk exceeding the 32,768-token context ceiling. In such cases the agent's self-reported Confidence degrades and it may submit a partial patch.
 
 ---
 

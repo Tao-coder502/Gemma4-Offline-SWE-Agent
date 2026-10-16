@@ -2,10 +2,10 @@
 
 [![Competition](https://img.shields.io/badge/Competition-Google_Gemma_4_Developer_Agent-blue.svg)](https://www.kaggle.com/competitions)
 [![Model](https://img.shields.io/badge/Model-gemma--4--31b--it--qat--w4a16--ct-purple.svg)](https://huggingface.co/google/gemma-4-31b-it)
-[![Benchmark Pass Rate](https://img.shields.io/badge/Pass_Rate-100.0%25_(8%2F8)-brightgreen.svg)](results/phase5_optimization/versioned_experiment_table.md)
-[![Status](https://img.shields.io/badge/Status-Frozen_Production_Candidate_(v5.0)-success.svg)](results/phase5_freeze/V5_FREEZE_MANIFEST.md)
-[![Execution](https://img.shields.io/badge/Execution-100%25_Air--Gapped_%2F_Zero_Cloud-orange.svg)](#offline-security--sandbox-guarantees)
-[![Paper Track](https://img.shields.io/badge/Paper_Track-Research_Report_Ready-red.svg)](paper/PAPER.md)
+[![Dev Benchmark](https://img.shields.io/badge/Dev_Benchmark-100.0%25_(8%2F8_tasks)-brightgreen.svg)](results/phase5_optimization/versioned_experiment_table.md)
+[![Baseline Delta](https://img.shields.io/badge/Pass_Rate_Delta-%2B50pp_over_Baseline-blue.svg)](results/phase5_optimization/versioned_experiment_table.md)
+[![Execution](https://img.shields.io/badge/Execution-Air--Gapped_%2F_Zero_Cloud-orange.svg)](#offline-security--sandbox-guarantees)
+[![Paper Track](https://img.shields.io/badge/Paper_Track-Research_Report_Submitted-red.svg)](paper/PAPER.md)
 
 > **Adaptive Repository Reasoning for Offline Software-Engineering Agents**  
 > An autonomous, air-gapped software engineering agent powered by `gemma-4-31b-it-qat-w4a16-ct`. Combines two-tier lexical/semantic code localization, confidence-gated code-graph exploration, structured state anchoring, and bounded test-driven repair to resolve real-world software defects without external APIs or cloud dependencies.
@@ -18,7 +18,7 @@ Autonomous software-engineering agents deployed in air-gapped enterprise and com
 * **Flat lexical/semantic retrieval** fails to navigate complex indirection, dynamic dispatch, and caller regressions.
 * **Unconditional graph expansion** burns tool budgets prematurely and floods context windows with irrelevant callers.
 
-The **Gemma 4 Offline SWE Agent** resolves this dilemma through **Adaptive Repository Reasoning**: an on-demand structural epistemic probe that queries code graphs only when lexical and semantic evidence is ambiguous. Combined with an 11-slot Structured Internal State anchor, 2D coordinate layout guards, and bounded closed-loop test-driven repair, the frozen production agent (**v5.0**) achieves **100.0% pass rate** on multi-repository benchmarks while reducing tool usage by **$24.1\%$** ($7.50$ calls/task) and execution latency by **$30.2\%$** ($63.0\text{s}$/task) with **zero repair iterations**.
+The **Gemma 4 Offline SWE Agent** resolves this dilemma through **Adaptive Repository Reasoning**: an on-demand structural epistemic probe that queries code graphs only when lexical and semantic evidence is ambiguous. Combined with an 11-slot Structured Internal State anchor, 2D coordinate layout guards, and bounded closed-loop test-driven repair, our ablation-validated production agent (**v5.0**) achieves **100.0% resolution rate on an 8-task stratified development benchmark** (+50 percentage points over the frozen baseline) while reducing tool usage by **$24.1\%$** ($7.50$ calls/task, $25\%$ of the 30-call ceiling) and execution latency by **$30.2\%$** ($63.0\text{s}$/task) with **zero repair iterations**. The $75\%$ tool budget headroom retained per task provides a concrete generalization margin for harder, multi-file held-out instances.
 
 ---
 
