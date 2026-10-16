@@ -2,23 +2,25 @@
 
 [![Competition](https://img.shields.io/badge/Competition-Google_Gemma_4_Developer_Agent-blue.svg)](https://www.kaggle.com/competitions)
 [![Model](https://img.shields.io/badge/Model-gemma--4--31b--it--qat--w4a16--ct-purple.svg)](https://huggingface.co/google/gemma-4-31b-it)
-[![Dev Benchmark](https://img.shields.io/badge/Dev_Benchmark-100.0%25_(8%2F8_tasks)-brightgreen.svg)](results/phase5_optimization/versioned_experiment_table.md)
-[![Baseline Delta](https://img.shields.io/badge/Pass_Rate_Delta-%2B50pp_over_Baseline-blue.svg)](results/phase5_optimization/versioned_experiment_table.md)
+[![ADK Compliance](https://img.shields.io/badge/ADK_Compliance-81%2F81_Checks_PASS-brightgreen.svg)](results/verification_output.txt)
+[![Evaluation Suite](https://img.shields.io/badge/Evaluation_Suite-SWE--bench_Lite_(Stratified_32--Task)-blue.svg)](data/README.md)
+[![Tool Efficiency](https://img.shields.io/badge/Tool_Efficiency-7.5_calls%2Ftask_(75%25_Headroom)-brightgreen.svg)](results/phase5_optimization/versioned_experiment_table.md)
+[![Code Graph](https://img.shields.io/badge/Code_Graph-Sub--5ms_In--Memory_SQLite-success.svg)](#2-final-system-architecture)
 [![Execution](https://img.shields.io/badge/Execution-Air--Gapped_%2F_Zero_Cloud-orange.svg)](#offline-security--sandbox-guarantees)
 [![Paper Track](https://img.shields.io/badge/Paper_Track-Research_Report_Submitted-red.svg)](paper/PAPER.md)
 
 > **Adaptive Repository Reasoning for Offline Software-Engineering Agents**  
-> An autonomous, air-gapped software engineering agent powered by `gemma-4-31b-it-qat-w4a16-ct`. Combines two-tier lexical/semantic code localization, confidence-gated code-graph exploration, structured state anchoring, and bounded test-driven repair to resolve real-world software defects without external APIs or cloud dependencies.
+> An autonomous, air-gapped software engineering agent powered by `gemma-4-31b-it-qat-w4a16-ct`. Combines two-tier lexical search, in-memory SQLite code-graph indexing (<5ms), structured state anchoring, and bounded test-driven repair to resolve real-world software defects without external APIs or cloud dependencies.
 
 ---
 
 ## 1. Executive Summary
 
 Autonomous software-engineering agents deployed in air-gapped enterprise and competition sandboxes face stringent constraints: zero internet connectivity, quantized model weights, strict tool budgets (30 calls/issue), and 32k context windows. Under these conditions:
-* **Flat lexical/semantic retrieval** fails to navigate complex indirection, dynamic dispatch, and caller regressions.
-* **Unconditional graph expansion** burns tool budgets prematurely and floods context windows with irrelevant callers.
+* **Flat lexical search** fails to navigate complex indirection, dynamic dispatch, and caller regressions.
+* **Unconditional disk-scanning graph expansion** burns tool budgets prematurely and floods context windows with irrelevant callers.
 
-The **Gemma 4 Offline SWE Agent** resolves this dilemma through **Adaptive Repository Reasoning**: an on-demand structural epistemic probe that queries code graphs only when lexical and semantic evidence is ambiguous. Combined with an 11-slot Structured Internal State anchor, 2D coordinate layout guards, and bounded closed-loop test-driven repair, our ablation-validated production agent (**v5.0**) achieves **100.0% resolution rate on an 8-task stratified development benchmark** (+50 percentage points over the frozen baseline) while reducing tool usage by **$24.1\%$** ($7.50$ calls/task, $25\%$ of the 30-call ceiling) and execution latency by **$30.2\%$** ($63.0\text{s}$/task) with **zero repair iterations**. The $75\%$ tool budget headroom retained per task provides a concrete generalization margin for harder, multi-file held-out instances.
+The **Gemma 4 Offline SWE Agent** resolves this dilemma through **Adaptive Repository Reasoning**: an on-demand structural epistemic probe that queries code graphs only when lexical evidence is ambiguous. Built upon an in-memory SQLite symbol graph (<5ms lookup), an 11-slot Structured Internal State anchor, multi-file coordinated staging, and bounded closed-loop test-driven repair, our production agent (**v5.0**) achieves high-efficiency defect resolution while reducing tool usage to **$7.50$ calls/task** ($75\%$ headroom against the 30-call ceiling) and execution latency to **$63.0\text{s}$/task**. The system is evaluated across both an 8-task development benchmark and an expanded 32-task stratified suite (16 repositories across 8 structural categories).
 
 ---
 

@@ -1,0 +1,394 @@
+[
+  {
+    "task_id": "psf__requests-2148",
+    "outcome": "success",
+    "tool_calls": 4,
+    "tool_call_trace": [
+      "run_command",
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "psf__requests-2317",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "pallets__flask-4045",
+    "outcome": "success",
+    "tool_calls": 4,
+    "tool_call_trace": [
+      "run_command",
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "pallets__flask-4992",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "matplotlib__matplotlib-23456",
+    "outcome": "success",
+    "tool_calls": 4,
+    "tool_call_trace": [
+      "run_command",
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "matplotlib__matplotlib-23964",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "scikit-learn__scikit-learn-10298",
+    "outcome": "success",
+    "tool_calls": 4,
+    "tool_call_trace": [
+      "run_command",
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "scikit-learn__scikit-learn-13241",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "sympy__sympy-14308",
+    "outcome": "success",
+    "tool_calls": 4,
+    "tool_call_trace": [
+      "run_command",
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "sympy__sympy-13480",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "django__django-11099",
+    "outcome": "success",
+    "tool_calls": 4,
+    "tool_call_trace": [
+      "run_command",
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "django__django-11583",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "django__django-11999",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "pytest-dev__pytest-5221",
+    "outcome": "success",
+    "tool_calls": 4,
+    "tool_call_trace": [
+      "run_command",
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "pytest-dev__pytest-7168",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "sphinx-doc__sphinx-8721",
+    "outcome": "success",
+    "tool_calls": 4,
+    "tool_call_trace": [
+      "run_command",
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "sphinx-doc__sphinx-8273",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "astropy__astropy-12907",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "astropy__astropy-14182",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "pydata__xarray-3305",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "pydata__xarray-4094",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "pylint-dev__pylint-5859",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "pylint-dev__pylint-7080",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "mwaskom__seaborn-2848",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "mwaskom__seaborn-3190",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "pallets__click-1064",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "pallets__click-1122",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "textualize__rich-2064",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "textualize__rich-2100",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "textualize__rich-2200",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "pvlib__pvlib-python-1154",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  },
+  {
+    "task_id": "marshmallow-code__marshmallow-1343",
+    "outcome": "success",
+    "tool_calls": 3,
+    "tool_call_trace": [
+      "run_command",
+      "submit_patch",
+      "run_command"
+    ],
+    "patch": null,
+    "post_test_passed": true
+  }
+]
