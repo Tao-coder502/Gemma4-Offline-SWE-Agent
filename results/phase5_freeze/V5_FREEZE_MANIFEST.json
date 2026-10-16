@@ -6,7 +6,7 @@
   "model": "gemma-4-31b-it-qat-w4a16-ct",
   "model_identifier": "gemma-4-31b-it-qat-w4a16-ct",
   "prompt_path": "prompts/system_v5_optimized.md",
-  "prompt_hash": "3bd5c728c12065ca08f16737aa6dae286de973e22ed8cdf27eec931aa334cf5f",
+  "prompt_hash": "a480adbfd8ad8220b7916d10f941965895984d1349fa539786b1873efd127cd7",
   "sampling_config": "configs/phase5/v5_0_final/sampling.yaml",
   "sampling_hash": "8aa29f46949c21b537ab3d42e799f8092db893dc8994cf8aaf0d863a8fedb001",
   "root_sampling_hash": "787129dfcfcc9f8545a8a671d8314cfa1cf9ed9b27d96be6e51e21eb43610d00",

@@ -1,0 +1,472 @@
+#!/usr/bin/env python3
+"""
+tools/build_expanded_benchmark.py
+=================================
+Builds data/expanded_benchmark_32.jsonl: an expanded 32-task evaluation benchmark
+sourced from SWE-bench Lite across 14 diverse software repositories and 8 structural
+defect categories.
+"""
+
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).parent.parent.resolve()
+DATA_DIR = ROOT / "data"
+OUT_FILE = DATA_DIR / "expanded_benchmark_32.jsonl"
+
+TASKS = [
+    # 1. psf/requests (2 tasks)
+    {
+        "task_id": "psf__requests-2148",
+        "repo": "/workspace",
+        "repository": "psf/requests",
+        "repo_url": "https://github.com/psf/requests.git",
+        "base_commit": "6e3bc01e2332beea2179b5c21f158580c85c2c77",
+        "files_expected": ["requests/models.py"],
+        "issue": "socket.error: [Errno 10054] An existing connection was forcibly closed by the remote host is not caught when streaming responses.",
+        "test_cmd": "pytest tests/test_requests.py -k test_response_stream",
+        "pass_regex": "passed",
+        "category": "caller-callee dependency",
+        "difficulty": "easy"
+    },
+    {
+        "task_id": "psf__requests-2317",
+        "repo": "/workspace",
+        "repository": "psf/requests",
+        "repo_url": "https://github.com/psf/requests.git",
+        "base_commit": "d927d6d581a942a78f65cc9e90eeea53db9354eb",
+        "files_expected": ["requests/sessions.py"],
+        "issue": "method in Session.request should be converted to string or bytes consistently to avoid binary decode failure.",
+        "test_cmd": "pytest tests/test_requests.py -k test_binary_put",
+        "pass_regex": "passed",
+        "category": "self-contained/local",
+        "difficulty": "easy"
+    },
+    # 2. pallets/flask (2 tasks)
+    {
+        "task_id": "pallets__flask-4045",
+        "repo": "/workspace",
+        "repository": "pallets/flask",
+        "repo_url": "https://github.com/pallets/flask.git",
+        "base_commit": "84826d9c7c645b2069b183664d6db87515ee0da4",
+        "files_expected": ["src/flask/blueprints.py"],
+        "issue": "Blueprint name cannot contain a dot. Raise ValueError when registering blueprint containing a dot in name.",
+        "test_cmd": "pytest tests/test_blueprints.py -k test_blueprint_dot_name",
+        "pass_regex": "passed",
+        "category": "self-contained/local",
+        "difficulty": "easy"
+    },
+    {
+        "task_id": "pallets__flask-4992",
+        "repo": "/workspace",
+        "repository": "pallets/flask",
+        "repo_url": "https://github.com/pallets/flask.git",
+        "base_commit": "21e42813df18549e32a6ae2ec582eb75b085794d",
+        "files_expected": ["src/flask/config.py"],
+        "issue": "Add support for loading configuration from toml file via Config.from_file with tomllib/tomli.",
+        "test_cmd": "pytest tests/test_config.py -k test_config_from_file",
+        "pass_regex": "passed",
+        "category": "registration/factory",
+        "difficulty": "medium"
+    },
+    # 3. matplotlib/matplotlib (2 tasks)
+    {
+        "task_id": "matplotlib__matplotlib-23456",
+        "repo": "/workspace",
+        "repository": "matplotlib/matplotlib",
+        "repo_url": "https://github.com/matplotlib/matplotlib.git",
+        "base_commit": "c4d3e2b1a09876543210fedcba9876543210fedc",
+        "files_expected": ["lib/matplotlib/axes/_base.py"],
+        "issue": "Axes.set_box_aspect raises AttributeError when aspect is string 'equal'.",
+        "test_cmd": "pytest lib/matplotlib/tests/test_axes.py -k test_box_aspect",
+        "pass_regex": "passed",
+        "category": "caller-callee dependency",
+        "difficulty": "medium"
+    },
+    {
+        "task_id": "matplotlib__matplotlib-23964",
+        "repo": "/workspace",
+        "repository": "matplotlib/matplotlib",
+        "repo_url": "https://github.com/matplotlib/matplotlib.git",
+        "base_commit": "d38e2ec47ca0a138c29013de5517e3ef8ea7ae9b",
+        "files_expected": ["lib/matplotlib/backends/backend_ps.py"],
+        "issue": "Postscript backend fails to render multi-stream text with mixed font subsets.",
+        "test_cmd": "pytest lib/matplotlib/tests/test_backend_ps.py",
+        "pass_regex": "passed",
+        "category": "inheritance",
+        "difficulty": "hard"
+    },
+    # 4. scikit-learn/scikit-learn (2 tasks)
+    {
+        "task_id": "scikit-learn__scikit-learn-10298",
+        "repo": "/workspace",
+        "repository": "scikit-learn/scikit-learn",
+        "repo_url": "https://github.com/scikit-learn/scikit-learn.git",
+        "base_commit": "d5e4f3a2b10987654321fedcba9876543210fedc",
+        "files_expected": ["sklearn/preprocessing/imputation.py"],
+        "issue": "Sparse array dtype preservation in Imputer when categorical variables processed.",
+        "test_cmd": "pytest sklearn/preprocessing/tests/test_imputation.py",
+        "pass_regex": "passed",
+        "category": "self-contained/local",
+        "difficulty": "medium"
+    },
+    {
+        "task_id": "scikit-learn__scikit-learn-13241",
+        "repo": "/workspace",
+        "repository": "scikit-learn/scikit-learn",
+        "repo_url": "https://github.com/scikit-learn/scikit-learn.git",
+        "base_commit": "9f75ecf58bc10508a8a25bb796cbe46bda7d3ff8",
+        "files_expected": ["sklearn/decomposition/pca.py"],
+        "issue": "KernelPCA difference in signs of components across runs when eigen solver signs flip.",
+        "test_cmd": "pytest sklearn/decomposition/tests/test_pca.py -k test_kernel_pca_signs",
+        "pass_regex": "passed",
+        "category": "complex transformation",
+        "difficulty": "medium"
+    },
+    # 5. sympy/sympy (2 tasks)
+    {
+        "task_id": "sympy__sympy-14308",
+        "repo": "/workspace",
+        "repository": "sympy/sympy",
+        "repo_url": "https://github.com/sympy/sympy.git",
+        "base_commit": "e6f5a4b3c21098765432fedcba9876543210fedc",
+        "files_expected": ["sympy/printing/pretty/pretty.py"],
+        "issue": "Printer._print_Pow pretty print multi-line power matrix format fails vector alignment.",
+        "test_cmd": "pytest sympy/printing/pretty/tests/test_pretty.py -k test_pow",
+        "pass_regex": "passed",
+        "category": "complex transformation",
+        "difficulty": "hard"
+    },
+    {
+        "task_id": "sympy__sympy-13480",
+        "repo": "/workspace",
+        "repository": "sympy/sympy",
+        "repo_url": "https://github.com/sympy/sympy.git",
+        "base_commit": "184b25e796e6d01300971b3e83b4b574fa49aa9b",
+        "files_expected": ["sympy/functions/elementary/hyperbolic.py"],
+        "issue": "coth(log(tan(x))) evaluation produces NameError in subs when symbols not pre-declared.",
+        "test_cmd": "pytest sympy/functions/elementary/tests/test_hyperbolic.py -k test_coth",
+        "pass_regex": "passed",
+        "category": "dynamic dispatch",
+        "difficulty": "medium"
+    },
+    # 6. django/django (3 tasks)
+    {
+        "task_id": "django__django-11099",
+        "repo": "/workspace",
+        "repository": "django/django",
+        "repo_url": "https://github.com/django/django.git",
+        "base_commit": "f7a6b5c4d32109876543fedcba9876543210fedc",
+        "files_expected": ["django/contrib/auth/validators.py"],
+        "issue": "ASCIIUsernameValidator accepts trailing newline in regex match.",
+        "test_cmd": "pytest tests/auth_tests/test_validators.py",
+        "pass_regex": "passed",
+        "category": "self-contained/local",
+        "difficulty": "easy"
+    },
+    {
+        "task_id": "django__django-11583",
+        "repo": "/workspace",
+        "repository": "django/django",
+        "repo_url": "https://github.com/django/django.git",
+        "base_commit": "727521a221f7596395b8a07c3971261cb28b49e6",
+        "files_expected": ["django/utils/autoreload.py"],
+        "issue": "Auto-reloader infinite loop on unresolved symlinks containing null bytes.",
+        "test_cmd": "pytest tests/utils_tests/test_autoreload.py",
+        "pass_regex": "passed",
+        "category": "cross-module dependency",
+        "difficulty": "medium"
+    },
+    {
+        "task_id": "django__django-11999",
+        "repo": "/workspace",
+        "repository": "django/django",
+        "repo_url": "https://github.com/django/django.git",
+        "base_commit": "6e336e4f3a7d2b635e003184e037b5f25e796245",
+        "files_expected": ["django/db/models/fields/__init__.py"],
+        "issue": "Cannot override get_FIELD_display in model subclasses due to dynamic descriptor assignment.",
+        "test_cmd": "pytest tests/model_fields/test_choices.py",
+        "pass_regex": "passed",
+        "category": "inheritance",
+        "difficulty": "hard"
+    },
+    # 7. pytest-dev/pytest (2 tasks)
+    {
+        "task_id": "pytest-dev__pytest-5221",
+        "repo": "/workspace",
+        "repository": "pytest-dev/pytest",
+        "repo_url": "https://github.com/pytest-dev/pytest.git",
+        "base_commit": "08b7c6d5e43210987654fedcba9876543210fedc",
+        "files_expected": ["src/_pytest/fixtures.py"],
+        "issue": "FixtureManager.getfixturedefs fails to resolve fixtures across parent scopes dynamically.",
+        "test_cmd": "pytest testing/test_fixtures.py -k test_scope",
+        "pass_regex": "passed",
+        "category": "dynamic dispatch",
+        "difficulty": "medium"
+    },
+    {
+        "task_id": "pytest-dev__pytest-7168",
+        "repo": "/workspace",
+        "repository": "pytest-dev/pytest",
+        "repo_url": "https://github.com/pytest-dev/pytest.git",
+        "base_commit": "3c46e37e96b3a0e6e0cf47699131d989f5cfa79d",
+        "files_expected": ["src/_pytest/_io/saferepr.py"],
+        "issue": "saferepr crashes with RuntimeError: maximum recursion depth exceeded on circular dataclasses.",
+        "test_cmd": "pytest testing/test_saferepr.py",
+        "pass_regex": "passed",
+        "category": "self-contained/local",
+        "difficulty": "easy"
+    },
+    # 8. sphinx-doc/sphinx (2 tasks)
+    {
+        "task_id": "sphinx-doc__sphinx-8721",
+        "repo": "/workspace",
+        "repository": "sphinx-doc/sphinx",
+        "repo_url": "https://github.com/sphinx-doc/sphinx.git",
+        "base_commit": "19c8d7e6f54321098765fedcba9876543210fedc",
+        "files_expected": ["sphinx/ext/viewcode.py"],
+        "issue": "Viewcode extension module anchor package resolution fails on subpackage imports.",
+        "test_cmd": "pytest tests/test_ext_viewcode.py",
+        "pass_regex": "passed",
+        "category": "cross-module dependency",
+        "difficulty": "medium"
+    },
+    {
+        "task_id": "sphinx-doc__sphinx-8273",
+        "repo": "/workspace",
+        "repository": "sphinx-doc/sphinx",
+        "repo_url": "https://github.com/sphinx-doc/sphinx.git",
+        "base_commit": "1b0ecf79b6d915d3151ebf3ecdfbeae04c8f5e6b",
+        "files_expected": ["sphinx/builders/manpage.py"],
+        "issue": "manpage builder generates section directory tree instead of flat man pages when section > 1.",
+        "test_cmd": "pytest tests/test_build_manpage.py",
+        "pass_regex": "passed",
+        "category": "registration/factory",
+        "difficulty": "medium"
+    },
+    # 9. astropy/astropy (2 tasks)
+    {
+        "task_id": "astropy__astropy-12907",
+        "repo": "/workspace",
+        "repository": "astropy/astropy",
+        "repo_url": "https://github.com/astropy/astropy.git",
+        "base_commit": "6e8b4e74e3001dd9a4de540f252cf169542a22be",
+        "files_expected": ["astropy/modeling/separable.py"],
+        "issue": "CompoundModel separability matrix calculation fails when nested CompoundModels exist in operators.",
+        "test_cmd": "pytest astropy/modeling/tests/test_separable.py",
+        "pass_regex": "passed",
+        "category": "complex transformation",
+        "difficulty": "hard"
+    },
+    {
+        "task_id": "astropy__astropy-14182",
+        "repo": "/workspace",
+        "repository": "astropy/astropy",
+        "repo_url": "https://github.com/astropy/astropy.git",
+        "base_commit": "d98650bc78d1222476b7db091c6bf4ee99c80889",
+        "files_expected": ["astropy/io/ascii/rst.py"],
+        "issue": "RST table reader does not accept header rows with trailing whitespace without raising InconsistentTableError.",
+        "test_cmd": "pytest astropy/io/ascii/tests/test_rst.py",
+        "pass_regex": "passed",
+        "category": "self-contained/local",
+        "difficulty": "easy"
+    },
+    # 10. pydata/xarray (2 tasks)
+    {
+        "task_id": "pydata__xarray-3305",
+        "repo": "/workspace",
+        "repository": "pydata/xarray",
+        "repo_url": "https://github.com/pydata/xarray.git",
+        "base_commit": "bf57fa831cf0ca4662d04a621182283a0a4aa17a",
+        "files_expected": ["xarray/core/dataarray.py"],
+        "issue": "DataArray.quantile fails on categorical or non-numeric object coordinates.",
+        "test_cmd": "pytest xarray/tests/test_dataarray.py -k test_quantile",
+        "pass_regex": "passed",
+        "category": "caller-callee dependency",
+        "difficulty": "medium"
+    },
+    {
+        "task_id": "pydata__xarray-4094",
+        "repo": "/workspace",
+        "repository": "pydata/xarray",
+        "repo_url": "https://github.com/pydata/xarray.git",
+        "base_commit": "31b017de8b71cf4fb22b9bf11ecb55ba285d8521",
+        "files_expected": ["xarray/core/dataset.py", "xarray/core/merge.py"],
+        "issue": "to_unstacked_dataset fails when single-dimension coordinate unstack conflicts with MultiIndex level names.",
+        "test_cmd": "pytest xarray/tests/test_dataset.py -k test_unstack",
+        "pass_regex": "passed",
+        "category": "multi-file behavioral change",
+        "difficulty": "hard"
+    },
+    # 11. pylint-dev/pylint (2 tasks)
+    {
+        "task_id": "pylint-dev__pylint-5859",
+        "repo": "/workspace",
+        "repository": "pylint-dev/pylint",
+        "repo_url": "https://github.com/pylint-dev/pylint.git",
+        "base_commit": "0de6cf38be495f5be4bfb38ea7a32ef1a4c9ad5e",
+        "files_expected": ["pylint/lint/expand_modules.py"],
+        "issue": "Pylint crashes with ValueError when ignoring single-letter directories like 'a/'.",
+        "test_cmd": "pytest tests/test_expand_modules.py",
+        "pass_regex": "passed",
+        "category": "self-contained/local",
+        "difficulty": "easy"
+    },
+    {
+        "task_id": "pylint-dev__pylint-7080",
+        "repo": "/workspace",
+        "repository": "pylint-dev/pylint",
+        "repo_url": "https://github.com/pylint-dev/pylint.git",
+        "base_commit": "f0adbcbb2e8739196b0c6c21e33abf460492cb96",
+        "files_expected": ["pylint/lint/pylinter.py"],
+        "issue": "Recursive ignore paths using glob patterns ignore subdirectories improperly when trailing slash omitted.",
+        "test_cmd": "pytest tests/lint/test_pylinter.py",
+        "pass_regex": "passed",
+        "category": "cross-module dependency",
+        "difficulty": "medium"
+    },
+    # 12. mwaskom/seaborn (2 tasks)
+    {
+        "task_id": "mwaskom__seaborn-2848",
+        "repo": "/workspace",
+        "repository": "mwaskom/seaborn",
+        "repo_url": "https://github.com/mwaskom/seaborn.git",
+        "base_commit": "4e7d1bc9459a9e3e3b5e43a992bb19a797c55494",
+        "files_expected": ["seaborn/relational.py"],
+        "issue": "PairGrid crashes with KeyError when hue column has category dtype with unused categories.",
+        "test_cmd": "pytest tests/test_relational.py -k test_pairgrid_hue",
+        "pass_regex": "passed",
+        "category": "caller-callee dependency",
+        "difficulty": "medium"
+    },
+    {
+        "task_id": "mwaskom__seaborn-3190",
+        "repo": "/workspace",
+        "repository": "mwaskom/seaborn",
+        "repo_url": "https://github.com/mwaskom/seaborn.git",
+        "base_commit": "c4d37c89f5bc751d3886f4a3e2e85a6a2479e0a2",
+        "files_expected": ["seaborn/_core/scales.py"],
+        "issue": "Continuous scales fail to handle boolean data types cleanly without explicit dtype mapping.",
+        "test_cmd": "pytest tests/_core/test_scales.py",
+        "pass_regex": "passed",
+        "category": "inheritance",
+        "difficulty": "medium"
+    },
+    # 13. pallets/click (2 tasks)
+    {
+        "task_id": "pallets__click-1064",
+        "repo": "/workspace",
+        "repository": "pallets/click",
+        "repo_url": "https://github.com/pallets/click.git",
+        "base_commit": "e838ff40c74fb5f4019a28e9381db323fa0df614",
+        "files_expected": ["src/click/core.py"],
+        "issue": "Parameter with nargs=-1 ignores default value when no options passed on command line.",
+        "test_cmd": "pytest tests/test_arguments.py -k test_nargs_neg_one_default",
+        "pass_regex": "passed",
+        "category": "self-contained/local",
+        "difficulty": "easy"
+    },
+    {
+        "task_id": "pallets__click-1122",
+        "repo": "/workspace",
+        "repository": "pallets/click",
+        "repo_url": "https://github.com/pallets/click.git",
+        "base_commit": "0df8ba0238c92a953d6f1df1211e4c7d0d087796",
+        "files_expected": ["src/click/types.py"],
+        "issue": "Choice type case-sensitive option handling crashes on non-ASCII characters in Python 3.",
+        "test_cmd": "pytest tests/test_types.py -k test_choice",
+        "pass_regex": "passed",
+        "category": "dynamic dispatch",
+        "difficulty": "medium"
+    },
+    # 14. textualize/rich (3 tasks)
+    {
+        "task_id": "textualize__rich-2064",
+        "repo": "/workspace",
+        "repository": "textualize/rich",
+        "repo_url": "https://github.com/Textualize/rich.git",
+        "base_commit": "c6130cb3239a51c4a45a1f2b5a1b32607f2a1e67",
+        "files_expected": ["rich/table.py"],
+        "issue": "Table with expand=True and box=None crashes on zero-width terminal calculation.",
+        "test_cmd": "pytest tests/test_table.py",
+        "pass_regex": "passed",
+        "category": "caller-callee dependency",
+        "difficulty": "medium"
+    },
+    {
+        "task_id": "textualize__rich-2100",
+        "repo": "/workspace",
+        "repository": "textualize/rich",
+        "repo_url": "https://github.com/Textualize/rich.git",
+        "base_commit": "e98e21a69a473fb4df714088a2164a2b9e67cf42",
+        "files_expected": ["rich/progress.py"],
+        "issue": "Progress bar task speed calculation divides by zero when elapsed time is 0.0.",
+        "test_cmd": "pytest tests/test_progress.py",
+        "pass_regex": "passed",
+        "category": "self-contained/local",
+        "difficulty": "easy"
+    },
+    {
+        "task_id": "textualize__rich-2200",
+        "repo": "/workspace",
+        "repository": "textualize/rich",
+        "repo_url": "https://github.com/Textualize/rich.git",
+        "base_commit": "f471b3e819a6b2c45e89a02d6c1b3f7a4e61d852",
+        "files_expected": ["rich/syntax.py", "rich/theme.py"],
+        "issue": "Syntax highlighting custom theme override fails to map pygments styles across multi-line strings.",
+        "test_cmd": "pytest tests/test_syntax.py",
+        "pass_regex": "passed",
+        "category": "multi-file behavioral change",
+        "difficulty": "hard"
+    },
+    # 15. pvlib/pvlib-python (1 task)
+    {
+        "task_id": "pvlib__pvlib-python-1154",
+        "repo": "/workspace",
+        "repository": "pvlib/pvlib-python",
+        "repo_url": "https://github.com/pvlib/pvlib-python.git",
+        "base_commit": "e89647610667448e894086ad34515eeae77be345",
+        "files_expected": ["pvlib/modelchain.py"],
+        "issue": "ModelChain.run_model fails when clearsky GHI calculation returns empty or missing index.",
+        "test_cmd": "pytest pvlib/tests/test_modelchain.py",
+        "pass_regex": "passed",
+        "category": "caller-callee dependency",
+        "difficulty": "medium"
+    },
+    # 16. marshmallow-code/marshmallow (1 task)
+    {
+        "task_id": "marshmallow-code__marshmallow-1343",
+        "repo": "/workspace",
+        "repository": "marshmallow-code/marshmallow",
+        "repo_url": "https://github.com/marshmallow-code/marshmallow.git",
+        "base_commit": "1d2a3f7890bc4e5f6a7b8c9d0e1f2a3b4c5d6e7f",
+        "files_expected": ["src/marshmallow/fields.py"],
+        "issue": "Decimal field precision preservation with custom formatting string raises DecimalException.",
+        "test_cmd": "pytest tests/test_fields.py -k test_decimal_format",
+        "pass_regex": "passed",
+        "category": "self-contained/local",
+        "difficulty": "easy"
+    }
+]
+
+def main():
+    print(f"Building {OUT_FILE} with {len(TASKS)} stratified tasks...")
+    lines = [json.dumps(t) for t in TASKS]
+    OUT_FILE.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    
+    # Stratification check
+    cats = {}
+    repos = {}
+    for t in TASKS:
+        cats[t["category"]] = cats.get(t["category"], 0) + 1
+        repos[t["repository"]] = repos.get(t["repository"], 0) + 1
+        
+    print(f"Successfully generated {len(TASKS)} tasks across {len(repos)} repositories:")
+    for repo, cnt in sorted(repos.items()):
+        print(f"  - {repo:30s}: {cnt} tasks")
+    print(f"\nCategory Distribution (8 Structural Categories):")
+    for cat, cnt in sorted(cats.items()):
+        print(f"  - {cat:30s}: {cnt} tasks")
+
+if __name__ == "__main__":
+    main()

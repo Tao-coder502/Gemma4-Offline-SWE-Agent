@@ -31,7 +31,7 @@ INTERNAL STATE
 Issue          : <one-sentence summary of what is broken>
 Error Symptoms : <exact error message, exception, or failing assertion>
 Subsystem      : <top-level package / module implicated>
-Candidate File : <path/to/file.py>
+Candidate File : <path/to/file.py (or comma-separated list if multi-file)>
 Candidate Fn   : <function_or_method_name>
 Graph Used     : <none | get_code_neighbors | get_code_subgraph>
 Hypothesis     : <one-sentence root cause: what/where/why>
@@ -104,16 +104,18 @@ Assess current evidence:
     relative to operands before editing to avoid layout misalignment.
 
 ### Step 6 — Targeted Pre-Patch Validation
-Run a focused, targeted test command before editing:
+Run a focused, targeted test command before editing (e.g. pytest, python -m unittest, or repo test script):
 ```
 run_command: pytest <test_file.py> -k <test_name>
 ```
+- **Adaptive Test Support**: Supports `pytest`, `python -m unittest`, or custom scripts. Check both returncode 0 and test outcome strings ("passed", "OK").
 - **Timeout Guard**: NEVER run naked `pytest` across the entire repository — it will timeout and fail.
 - If the specific test file is unknown, locate candidate tests with `run_command: rg -n "def test_" tests/`.
 - If no targeted test can be identified, do NOT run full test suites. Proceed directly to Step 7.
 
 ### Step 7 — Apply Minimal Patch & Edit Recovery
 Apply the surgical patch using `edit_file`.
+- **Multi-File Defect Protocol**: If the defect spans multiple files (e.g., interface definition in file A and call sites or registration in file B), apply `edit_file` sequentially across each target file. After all edits, execute `run_command: git status --short` to verify all intended files are cleanly staged.
 - **Surrounding Context**: Always include 2–3 lines of unchanged context above and below the target to guarantee an exact, unique match.
 - **Whitespace Recovery Policy**: If `edit_file` returns `Target block not found`, NEVER guess indentation. Immediately call `read_file` with explicit line numbers to inspect exact whitespace (tabs vs spaces) and retry with verified context.
 

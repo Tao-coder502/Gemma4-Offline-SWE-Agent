@@ -66,3 +66,17 @@ When categorizing tasks for structural evaluation, use the standard taxonomy:
 5. `inheritance`: Defect depends on base class virtual method behaviors or mixin hierarchies.
 6. `registration/factory`: Defect involves central factory mapping or type registration.
 7. `complex transformation`: Multi-line AST manipulation, formatting, or compiler/parser passes.
+8. `multi-file behavioral change`: Defect coordinates simultaneous changes across multiple interrelated files.
+
+---
+
+## 4. Benchmark Suites
+
+### A. Development Benchmark (`data/benchmark_tasks.jsonl`, N = 8)
+- Standardized pilot benchmark for rapid parameter optimization and ablation verification.
+- Pinned commit hashes and exact test commands.
+
+### B. Expanded Evaluation Suite (`data/expanded_benchmark_32.jsonl`, N = 32)
+- Stratified sample across **16 diverse open-source repositories** (Astropy, Pylint, Xarray, Seaborn, Pvlib, Marshmallow, Click, Rich, Requests, Flask, Matplotlib, Scikit-learn, Sympy, Django, Pytest, Sphinx).
+- Covers all 8 structural defect categories including multi-file behavioral refactoring and diverse test frameworks.
+- Designed to validate out-of-distribution generalization and prevent benchmark overfitting prior to competition submission.
