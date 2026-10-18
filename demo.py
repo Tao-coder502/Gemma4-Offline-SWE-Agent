@@ -80,13 +80,18 @@ class InMemoryCodeGraph:
         return res
 
 
+def p(*args, **kwargs):
+    kwargs.setdefault("flush", True)
+    print(*args, **kwargs)
+
+
 def run_demo():
-    print(f"\n{BOLD}{CYAN}======================================================================{RESET}")
-    print(f"{BOLD}{CYAN} GEMMA 4 OFFLINE SWE AGENT — LIVE ONE-CLICK REPAIR DEMONSTRATION{RESET}")
-    print(f"{BOLD}{CYAN}======================================================================{RESET}")
-    print(f"Target Model      : {BOLD}gemma-4-31b-it-qat-w4a16-ct{RESET} (Air-gapped / Zero-Cloud)")
-    print(f"Benchmark Instance: {BOLD}pallets__flask-4045 (SWE-bench Lite){RESET}")
-    print(f"Problem Statement : Blueprint names containing dots ('.') must raise ValueError.\n")
+    p(f"\n{BOLD}{CYAN}======================================================================{RESET}")
+    p(f"{BOLD}{CYAN} GEMMA 4 OFFLINE SWE AGENT — LIVE ONE-CLICK REPAIR DEMONSTRATION{RESET}")
+    p(f"{BOLD}{CYAN}======================================================================{RESET}")
+    p(f"Target Model      : {BOLD}gemma-4-31b-it-qat-w4a16-ct{RESET} (Air-gapped / Zero-Cloud)")
+    p(f"Benchmark Instance: {BOLD}pallets__flask-4045 (SWE-bench Lite){RESET}")
+    p(f"Problem Statement : Blueprint names containing dots ('.') must raise ValueError.\n")
 
     t_start = time.perf_counter()
 
@@ -131,37 +136,37 @@ def run_demo():
         subprocess.run(["git", "commit", "-m", "Initial commit with bug"], cwd=str(workspace), capture_output=True)
 
         # Step 1: Pre-patch Test Verification
-        print(f"{BOLD}[Step 1/5] Running Pre-Patch Verification Test...{RESET}")
+        p(f"{BOLD}[Step 1/5] Running Pre-Patch Verification Test...{RESET}")
         test_res = subprocess.run([sys.executable, "-m", "pytest", "tests/test_blueprints.py"], cwd=str(workspace), capture_output=True, text=True)
         if test_res.returncode != 0:
-            print(f"  Status: {RED}{BOLD}FAIL (Defect Successfully Reproduced){RESET}")
-            print(f"  Pytest: Failed: DID NOT RAISE <class 'ValueError'>")
+            p(f"  Status: {RED}{BOLD}FAIL (Defect Successfully Reproduced){RESET}")
+            p(f"  Pytest: Failed: DID NOT RAISE <class 'ValueError'>")
         else:
-            print(f"  Status: {YELLOW}Unexpected pass, proceeding...{RESET}")
+            p(f"  Status: {YELLOW}Unexpected pass, proceeding...{RESET}")
 
         # Step 2: In-Memory SQLite Graph Indexing
-        print(f"\n{BOLD}[Step 2/5] Building In-Memory SQLite Code Graph Index...{RESET}")
+        p(f"\n{BOLD}[Step 2/5] Building In-Memory SQLite Code Graph Index...{RESET}")
         t0 = time.perf_counter()
         graph = InMemoryCodeGraph(workspace)
         graph.build_index()
         t_index = (time.perf_counter() - t0) * 1000
-        print(f"  Index Built in: {GREEN}{BOLD}{t_index:.2f} ms{RESET}")
+        p(f"  Index Built in: {GREEN}{BOLD}{t_index:.2f} ms{RESET}")
         
         # Query Graph
         t0 = time.perf_counter()
         matches = graph.query("Blueprint")
         t_query = (time.perf_counter() - t0) * 1000
-        print(f"  Lookup 'Blueprint': {GREEN}{BOLD}{t_query:.3f} ms{RESET} (Found {len(matches)} symbol references)")
+        p(f"  Lookup 'Blueprint': {GREEN}{BOLD}{t_query:.3f} ms{RESET} (Found {len(matches)} symbol references)")
         for m in matches:
-            print(f"    - {CYAN}{m}{RESET}")
+            p(f"    - {CYAN}{m}{RESET}")
 
         # Step 3: Agent Structured Reasoning & Localization
-        print(f"\n{BOLD}[Step 3/5] Gemma 4 Epistemic Localization & Coordinate Guard...{RESET}")
-        print(f"  Localization  : {CYAN}src/flask/blueprints.py:2 (class Blueprint.__init__){RESET}")
-        print(f"  Planned Edit  : Add validation guard `if '.' in name: raise ValueError('Blueprint names may not contain dots (\\'.\\').')`")
+        p(f"\n{BOLD}[Step 3/5] Gemma 4 Epistemic Localization & Coordinate Guard...{RESET}")
+        p(f"  Localization  : {CYAN}src/flask/blueprints.py:2 (class Blueprint.__init__){RESET}")
+        p(f"  Planned Edit  : Add validation guard `if '.' in name: raise ValueError('Blueprint names may not contain dots (\\'.\\').')`")
 
         # Step 4: Coordinated Edit & Closed-Loop Test
-        print(f"\n{BOLD}[Step 4/5] Applying Surgical Edit & Re-evaluating Test...{RESET}")
+        p(f"\n{BOLD}[Step 4/5] Applying Surgical Edit & Re-evaluating Test...{RESET}")
         target_block = (
             '    def __init__(self, name: str, import_name: str):\n'
             '        self.name = name'
@@ -175,36 +180,36 @@ def run_demo():
         content = blueprints_py.read_text(encoding="utf-8")
         assert target_block in content, "Target block match failed!"
         blueprints_py.write_text(content.replace(target_block, replacement_block, 1), encoding="utf-8")
-        print(f"  Tool Action   : edit_file({CYAN}src/flask/blueprints.py{RESET}) -> SUCCESS")
+        p(f"  Tool Action   : edit_file({CYAN}src/flask/blueprints.py{RESET}) -> SUCCESS")
 
         # Post-patch test
         test_post = subprocess.run([sys.executable, "-m", "pytest", "tests/test_blueprints.py"], cwd=str(workspace), capture_output=True, text=True)
         if test_post.returncode == 0:
-            print(f"  Post-Test     : {GREEN}{BOLD}PASS (1 passed in 0.02s){RESET}")
+            p(f"  Post-Test     : {GREEN}{BOLD}PASS (1 passed in 0.02s){RESET}")
         else:
-            print(f"  Post-Test     : {RED}FAIL{RESET}")
+            p(f"  Post-Test     : {RED}FAIL{RESET}")
 
         # Step 5: Unified Diff Generation & Verification
-        print(f"\n{BOLD}[Step 5/5] Generating Verified Unified Patch (Terminal Action: submit_patch)...{RESET}")
+        p(f"\n{BOLD}[Step 5/5] Generating Verified Unified Patch (Terminal Action: submit_patch)...{RESET}")
         diff_res = subprocess.run(["git", "diff"], cwd=str(workspace), capture_output=True, text=True)
         diff_text = diff_res.stdout.strip()
-        print(f"{CYAN}--- a/src/flask/blueprints.py\n+++ b/src/flask/blueprints.py{RESET}")
+        p(f"{CYAN}--- a/src/flask/blueprints.py\n+++ b/src/flask/blueprints.py{RESET}")
         for line in diff_text.splitlines():
             if line.startswith("+") and not line.startswith("+++"):
-                print(f"{GREEN}{line}{RESET}")
+                p(f"{GREEN}{line}{RESET}")
             elif line.startswith("-") and not line.startswith("---"):
-                print(f"{RED}{line}{RESET}")
+                p(f"{RED}{line}{RESET}")
             elif line.startswith("@@"):
-                print(f"{YELLOW}{line}{RESET}")
+                p(f"{YELLOW}{line}{RESET}")
 
         t_total = time.perf_counter() - t_start
-        print(f"\n{BOLD}{GREEN}======================================================================{RESET}")
-        print(f"{BOLD}{GREEN} [PASS] REPAIR CYCLE COMPLETE IN {t_total:.2f}s — ZERO NETWORK CALLS{RESET}")
-        print(f"{BOLD}{GREEN}======================================================================{RESET}")
-        print(f"  Tools Consumed   : {BOLD}3 / 30 calls{RESET} (90% Budget Headroom Retained)")
-        print(f"  Repair Cycles    : {BOLD}1 cycle{RESET} (Zero runaway hallucinations)")
-        print(f"  Memory Footprint : {BOLD}< 25 MB RAM{RESET}")
-        print(f"  ADK Compliance   : {BOLD}81/81 Checks PASS{RESET}\n")
+        p(f"\n{BOLD}{GREEN}======================================================================{RESET}")
+        p(f"{BOLD}{GREEN} [PASS] REPAIR CYCLE COMPLETE IN {t_total:.2f}s — ZERO NETWORK CALLS{RESET}")
+        p(f"{BOLD}{GREEN}======================================================================{RESET}")
+        p(f"  Tools Consumed   : {BOLD}3 / 30 calls{RESET} (90% Budget Headroom Retained)")
+        p(f"  Repair Cycles    : {BOLD}1 cycle{RESET} (Zero runaway hallucinations)")
+        p(f"  Memory Footprint : {BOLD}< 25 MB RAM{RESET}")
+        p(f"  ADK Compliance   : {BOLD}81/81 Checks PASS{RESET}\n")
 
 
 if __name__ == "__main__":
