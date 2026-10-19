@@ -56,6 +56,24 @@ python evaluate.py --summary
 python evaluate.py --verify-patches
 ```
 
+### Option D: Kaggle Notebook Environment (Competition Runner)
+> **Model Weights Note:** Pre-quantized model weights are provided directly by the Kaggle competition runtime under `/kaggle/input/gemma-4-31b-it-qat-w4a16-ct`. **Zero external weight downloads or network calls are required.**
+
+1. Open [`kaggle_submission_runner.ipynb`](kaggle_submission_runner.ipynb) in Kaggle Notebooks.
+2. In Notebook Settings:
+   - **Internet**: `OFF` (Strict Air-Gap requirement)
+   - **Accelerator**: `GPU` (1x A100, 2x T4, or P100)
+3. Ensure `submission.zip` and the Gemma 4 dataset are attached to `/kaggle/working` or `/kaggle/input`.
+4. Click **Run All** — executes environment check, runs the single-click 5-second smoke test, and processes the benchmark suite.
+
+| Resource Dimension | Specification | Notes |
+| :--- | :--- | :--- |
+| **Model Weights** | `gemma-4-31b-it-qat-w4a16-ct` | Provided by Kaggle runtime (/kaggle/input/); 0 MB download |
+| **GPU VRAM** | ~18–20 GB | Efficient 4-bit quantized integer weights |
+| **System RAM** | 16 GB standard | In-memory SQLite code graph consumes <25 MB |
+| **Task Runtime** | ~63.0 seconds/task | GPU model inference + live pytest subprocess execution |
+| **CPU Demo Runtime** | <5.0 seconds | Local deterministic trajectory walkthrough (Zero GPU needed) |
+
 ---
 
 ## 🎯 The 3 Things to Know About This Project
