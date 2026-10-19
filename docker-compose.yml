@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gemma4-offline-swe-agent:latest
+    container_name: gemma4_swe_agent
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: python demo.py
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gemma4-offline-swe-agent:latest
+    volumes:
+      - .:/app
+    command: pytest tests/ -v
+
+  verify:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: gemma4-offline-swe-agent:latest
+    volumes:
+      - .:/app
+    command: python tools/verify_clean_submission.py

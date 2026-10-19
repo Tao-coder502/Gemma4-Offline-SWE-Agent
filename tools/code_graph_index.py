@@ -25,8 +25,9 @@ class SQLiteCodeGraph:
     In-memory SQLite symbol and call-graph indexer.
     Builds in <1.5s on startup, queries in <5ms.
     """
-    def __init__(self, workspace_path: Path):
-        self.workspace = Path(workspace_path).resolve()
+    def __init__(self, workspace_path: Optional[Path] = None, workspace: Optional[Path] = None):
+        target = workspace or workspace_path or Path(".")
+        self.workspace = Path(target).resolve()
         self.conn = sqlite3.connect(":memory:")
         self._init_schema()
         self._indexed_files: set[str] = set()

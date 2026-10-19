@@ -1,32 +1,59 @@
 # Gemma 4 Offline SWE Agent
 
-[![Competition](https://img.shields.io/badge/Competition-Google_Gemma_4_Developer_Agent-blue.svg)](https://www.kaggle.com/competitions)
-[![Model](https://img.shields.io/badge/Model-gemma--4--31b--it--qat--w4a16--ct-purple.svg)](https://huggingface.co/google/gemma-4-31b-it)
+[![CI Pipeline](https://github.com/Tao-coder502/Gemma4-Offline-SWE-Agent/actions/workflows/ci.yml/badge.svg)](https://github.com/Tao-coder502/Gemma4-Offline-SWE-Agent/actions)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg)](pyproject.toml)
+[![Tests](https://img.shields.io/badge/Tests-11%2F11_Unit_Tests_PASS-brightgreen.svg)](tests/)
 [![ADK Compliance](https://img.shields.io/badge/ADK_Compliance-81%2F81_Checks_PASS-brightgreen.svg)](results/verification_output.txt)
 [![Evaluation Suite](https://img.shields.io/badge/Evaluation_Suite-SWE--bench_Lite_(Stratified_32--Task)-blue.svg)](data/README.md)
-[![Tool Efficiency](https://img.shields.io/badge/Tool_Efficiency-7.5_calls%2Ftask_(75%25_Headroom)-brightgreen.svg)](results/phase5_optimization/versioned_experiment_table.md)
-[![Code Graph](https://img.shields.io/badge/Code_Graph-Sub--5ms_In--Memory_SQLite-success.svg)](#2-final-system-architecture)
+[![Security](https://img.shields.io/badge/Security-PathJail_%2B_SAST_Auditor-success.svg)](#-defense-in-depth-security--host-containment)
 [![Execution](https://img.shields.io/badge/Execution-Air--Gapped_%2F_Zero_Cloud-orange.svg)](#offline-security--sandbox-guarantees)
 [![Paper Track](https://img.shields.io/badge/Paper_Track-Research_Report_Submitted-red.svg)](paper/PAPER.md)
 
 > **Adaptive Repository Reasoning for Offline Software-Engineering Agents**  
-> An autonomous, air-gapped software engineering agent powered by `gemma-4-31b-it-qat-w4a16-ct`. Combines two-tier lexical search, in-memory SQLite code-graph indexing (<5ms), structured state anchoring, and bounded test-driven repair to resolve real-world software defects without external APIs or cloud dependencies.
+> An autonomous, air-gapped software engineering agent powered by `gemma-4-31b-it-qat-w4a16-ct`. Combines two-tier lexical search, in-memory SQLite code-graph indexing (<5ms), structured state anchoring, defense-in-depth path jailing, AST SAST diff auditing, and bounded test-driven repair to resolve real-world software defects without external APIs or cloud dependencies.
 
 ---
 
-## ⚡ Quickstart: Run Live Demo in 5 Seconds
+## ⚡ 60-Second Quickstart
 
-Anyone can verify the agent live on a defect from SWE-bench Lite without downloading weights or needing cloud access:
+Get up and running in under a minute using your preferred workflow:
 
+### Option A: Local Python Environment (Recommended)
 ```bash
-# Clone and run interactive repair demonstration
+# 1. Clone repository and install dependencies
+git clone https://github.com/Tao-coder502/Gemma4-Offline-SWE-Agent.git
+cd Gemma4-Offline-SWE-Agent
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install -r requirements-dev.txt
+pip install -e .
+
+# 2. Run live interactive SWE agent demo (<5 seconds)
 python demo.py
-```
-> **What this runs:** Creates an isolated git repo with a reproduced defect (`pallets__flask-4045`), builds the in-memory SQLite symbol graph in ~20ms, queries symbol relationships in 0.04ms, generates a surgical patch, passes the test suite (`FAIL -> PASS`), and outputs the verified unified diff.
 
-```bash
-# Verify 100% compliance against the Google ADK competition specification (81 checks):
+# 3. Run full test suite & competition compliance verifier
+pytest tests/ -v
 python tools/verify_clean_submission.py
+```
+
+### Option B: Docker Container (One-Liner)
+```bash
+# Build and run the isolated SWE agent container:
+docker build -t gemma4-agent .
+docker run --rm gemma4-agent
+
+# Run test suite inside container:
+docker run --rm gemma4-agent pytest tests/ -v
+```
+
+### Option C: Benchmark Evaluation CLI
+```bash
+# Inspect 32-task stratified benchmark coverage across 16 repositories:
+python evaluate.py --summary
+
+# Run SAST security and syntax audit on all 32 benchmark patches:
+python evaluate.py --verify-patches
 ```
 
 ---
@@ -184,14 +211,17 @@ Gemma4-Offline-SWE-Agent/
 
 ---
 
-## 6. Offline Security & Sandbox Guarantees
+## 6. Offline Security & Defense-in-Depth Host Containment
 
-The agent is built from the ground up to operate safely in fully isolated, air-gapped environments:
+The agent is built from the ground up to operate safely in fully isolated, air-gapped environments with multi-layered host containment:
+* **Host-Level Path Jailing (`PathJail`)**: All filesystem operations (`read_file`, `write_file`, `edit_file`) are strictly path-canonicalized and prevented from traversing outside `/workspace` or `/tmp`. Any directory traversal attempts (`../../`, absolute system paths) trigger immediate `SecurityJailViolation` blocks.
+* **Destructive Command Sanitization (`CommandSanitizer`)**: The command execution pipeline intercepts and blocks high-risk host-destructive patterns (`rm -rf /`, `mkfs`, fork bombs) and unauthorized networking binaries (`curl`, `wget`, `nc`, `ncat`, `telnet`).
+* **Automated Patch SAST Auditing (`PatchSecurityAuditor`)**: Before `submit_patch` is accepted, proposed unified diffs are statically analyzed via AST and pattern scanners. Any introduction of forbidden execution primitives (`eval`, `exec`, `os.system`, `pickle.loads`, interactive PTYs) or credential leakage immediately rejects the patch with diagnostic guidance.
 * **Zero External Network Access**: Completely free of HTTP/HTTPS calls, sockets, cloud endpoints, or external dependencies. Verified automatically by `tools/verify_clean_submission.py`.
 * **Zero Secrets or API Keys**: Contains no tokens, private keys, or credentials anywhere in the repository or submission zip.
-* **Strict Filesystem Isolation**: Anchored strictly to `/workspace` for repository code and `/tmp` for scratch scripts. Never writes to host filesystem paths.
+* **Strict Filesystem Isolation**: Anchored strictly to `/workspace` for repository code and `/tmp` for scratch scripts.
 * **Google ADK Schema Compliance**: Validated against the official Google Agent Development Kit specification. All non-standard keys (`sub_agents`, `adapters`, `lora`) are strictly excluded.
-* **Deterministic Execution**: Low temperature ($0.1$) and top-p ($0.90$) ensure high reproducibility across evaluation runs.
+* **Deterministic Execution**: Frozen temperature ($0.1$) and top-p ($0.90$) ensure high reproducibility across evaluation runs.
 
 ---
 

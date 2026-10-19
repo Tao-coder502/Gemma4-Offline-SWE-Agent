@@ -22,6 +22,7 @@ class TestOutcome(tuple):
     Dual-compatible outcome tuple: unpacks cleanly as 2-tuple (passed, summary)
     while exposing .passed, .summary, and .error_signature attributes.
     """
+    __test__ = False
     passed: bool
     summary: str
     error_signature: Optional[str]
