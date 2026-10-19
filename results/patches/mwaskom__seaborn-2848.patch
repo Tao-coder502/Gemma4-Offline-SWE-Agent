@@ -1,0 +1,6 @@
+--- a/seaborn/relational.py
++++ b/seaborn/relational.py
+@@ -618,6 +618,8 @@ class _RelationalPlotter(_VectorPlotter):
+         if self.hue is not None:
++            if hasattr(self.plot_data[self.hue], "cat"):
++                self.plot_data[self.hue] = self.plot_data[self.hue].cat.remove_unused_categories()

@@ -1,0 +1,6 @@
+--- a/pylint/lint/expand_modules.py
++++ b/pylint/lint/expand_modules.py
+@@ -82,6 +82,8 @@ def expand_modules(files_or_modules, ignore_list, ignore_list_re, ignore_list_paths):
+             basename = os.path.basename(element)
++            if basename in ignore_list:
++                continue

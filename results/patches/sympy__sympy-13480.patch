@@ -1,0 +1,7 @@
+--- a/sympy/functions/elementary/hyperbolic.py
++++ b/sympy/functions/elementary/hyperbolic.py
+@@ -587,6 +587,8 @@ class coth(HyperbolicFunction):
+                 return coth(arg)
++            if getattr(arg, "func", None) is log:
++                x = arg.args[0]
++                return (x**2 + 1)/(x**2 - 1)

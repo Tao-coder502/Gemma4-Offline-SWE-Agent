@@ -1,0 +1,9 @@
+--- a/sklearn/decomposition/pca.py
++++ b/sklearn/decomposition/pca.py
+@@ -592,6 +592,8 @@ class KernelPCA(TransformerMixin, BaseEstimator):
+         # sort eigenvectors in descending order
+         indices = self.lambdas_.argsort()[::-1]
+         self.alphas_ = self.alphas_[:, indices]
++        max_abs_cols = np.argmax(np.abs(self.alphas_), axis=0)
++        signs = np.sign(self.alphas_[max_abs_cols, range(self.alphas_.shape[1])])
++        self.alphas_ *= signs

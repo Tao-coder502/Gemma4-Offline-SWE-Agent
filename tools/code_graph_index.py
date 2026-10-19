@@ -144,28 +144,49 @@ class SQLiteCodeGraph:
             cur.executemany("INSERT INTO calls VALUES (?, ?, ?, ?)", visitor.calls)
         self._indexed_files.add(rel_path)
 
-    def query_neighbors(self, symbol: str, direction: str = "incoming", limit: int = 10) -> str:
-        """Fast indexed neighbor resolution (<5ms)."""
+    def query_neighbors(
+        self,
+        symbol: str = "",
+        node: str = "",
+        direction: str = "incoming",
+        edge_type: str | None = None,
+        limit: int = 10,
+        max_neighbors: int = 50,
+        **kwargs: Any
+    ) -> str:
+        """Fast indexed neighbor resolution (<5ms). Supports symbol or node keyword."""
         if not self._is_fully_indexed:
             self.build_index()
 
+        target = (node or symbol).strip()
+        effective_limit = min(limit, max_neighbors)
+        effective_dir = (edge_type or direction or "incoming").lower()
+        if "call" in effective_dir:
+            if "caller" in effective_dir or "in" in effective_dir:
+                effective_dir = "incoming"
+            else:
+                effective_dir = "outgoing"
+
         # Handle Class.method or module.func by taking leaf symbol
-        sym = symbol.split(".")[-1].strip()
+        sym = target.split(".")[-1].strip() if target else ""
+        if not sym:
+            return "[No symbol provided for neighbor query]"
+
         cur = self.conn.cursor()
         matches = []
 
-        if direction in ("incoming", "both"):
+        if effective_dir in ("incoming", "both"):
             cur.execute(
                 "SELECT file_path, lineno, caller FROM calls WHERE callee = ? LIMIT ?",
-                (sym, limit)
+                (sym, effective_limit)
             )
             for f, line, caller in cur.fetchall():
                 matches.append(f"{f}:{line} -> {caller}() calls {sym}")
 
-        if direction in ("outgoing", "both"):
+        if effective_dir in ("outgoing", "both"):
             cur.execute(
                 "SELECT file_path, lineno, callee FROM calls WHERE caller = ? LIMIT ?",
-                (sym, limit)
+                (sym, effective_limit)
             )
             for f, line, callee in cur.fetchall():
                 matches.append(f"{f}:{line} -> {sym}() calls {callee}")
@@ -174,13 +195,35 @@ class SQLiteCodeGraph:
             # Fallback to definitions
             cur.execute(
                 "SELECT file_path, lineno, kind FROM symbols WHERE name = ? LIMIT ?",
-                (sym, limit)
+                (sym, effective_limit)
             )
             for f, line, kind in cur.fetchall():
                 matches.append(f"{f}:{line} -> defines {kind} {sym}")
 
-        return "\n".join(matches[:limit]) if matches else f"[No AST neighbors resolved for '{symbol}']"
+        return "\n".join(matches[:effective_limit]) if matches else f"[No AST neighbors resolved for '{target}']"
 
-    def query_subgraph(self, symbol: str, max_depth: int = 1) -> str:
-        """Returns callers, callees, and definitions in a unified subgraph."""
-        return self.query_neighbors(symbol, direction="both", limit=12)
+    def query_subgraph(
+        self,
+        symbol: str = "",
+        nodes: list[str] | str | None = None,
+        max_depth: int = 1,
+        limit: int = 12,
+        **kwargs: Any
+    ) -> str:
+        """
+        Returns callers, callees, and definitions in a unified subgraph.
+        Supports both symbol='name' and nodes=['SymbolA', 'SymbolB'].
+        """
+        if nodes:
+            if isinstance(nodes, str):
+                symbol_list = [nodes]
+            elif isinstance(nodes, (list, tuple)):
+                symbol_list = list(nodes)
+            else:
+                symbol_list = [str(nodes)]
+            parts = []
+            for s in symbol_list[:6]:
+                res = self.query_neighbors(symbol=s, direction="both", limit=limit)
+                parts.append(f"--- Subgraph for '{s}' ---\n{res}")
+            return "\n\n".join(parts)
+        return self.query_neighbors(symbol=symbol, direction="both", limit=limit)

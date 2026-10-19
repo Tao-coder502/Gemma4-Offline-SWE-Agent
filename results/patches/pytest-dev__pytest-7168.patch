@@ -1,0 +1,8 @@
+--- a/src/_pytest/_io/saferepr.py
++++ b/src/_pytest/_io/saferepr.py
+@@ -48,6 +48,8 @@ class SafeRepr(reprlib.Repr):
+         try:
++            if hasattr(self, "_seen") and id(x) in self._seen:
++                return "..."
+             return super().repr(x)
+         except Exception:

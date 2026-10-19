@@ -1,0 +1,7 @@
+--- a/astropy/modeling/separable.py
++++ b/astropy/modeling/separable.py
+@@ -242,6 +242,8 @@ def _separable(transform):
+     if isinstance(transform, CompoundModel):
++        if isinstance(transform.left, CompoundModel):
++            transform.left = _separable(transform.left)
+         return _operators[transform.op](transform)

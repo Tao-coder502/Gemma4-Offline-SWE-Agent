@@ -1,0 +1,6 @@
+--- a/src/marshmallow/fields.py
++++ b/src/marshmallow/fields.py
+@@ -825,6 +825,8 @@ class Decimal(Number):
+         if isinstance(value, decimal.Decimal):
++            if self.places is not None:
++                return quantize(value, self.places)

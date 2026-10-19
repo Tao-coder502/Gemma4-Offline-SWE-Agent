@@ -1,0 +1,6 @@
+--- a/rich/progress.py
++++ b/rich/progress.py
+@@ -723,6 +723,8 @@ class Task:
+         if self.finished:
++            if self.finished_time <= self.start_time:
++                return 0.0

@@ -1,0 +1,6 @@
+--- a/seaborn/_core/scales.py
++++ b/seaborn/_core/scales.py
+@@ -348,6 +348,8 @@ class Continuous(ContinuousBase):
+         if prop.normed:
++            if data.dtype == bool:
++                data = data.astype(float)

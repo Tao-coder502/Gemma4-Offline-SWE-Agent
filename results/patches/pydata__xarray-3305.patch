@@ -1,0 +1,6 @@
+--- a/xarray/core/dataarray.py
++++ b/xarray/core/dataarray.py
+@@ -1885,6 +1885,8 @@ class DataArray(AbstractArray, DataWithCoords):
+         ds = self._to_temp_dataset().quantile(
++            q=q, dim=dim, interpolation=interpolation, keep_attrs=keep_attrs
+         )

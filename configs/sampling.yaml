@@ -1,5 +1,5 @@
 # ============================================================
-# Optimized Sampling Configuration (Phase 5 / v5.0 Production)
+# Optimized Sampling Configuration (Phase 5 / v5.0 Final)
 # Harness-safe: deterministic code synthesis (temp=0.1, top_p=0.90)
 # ============================================================
 temperature: 0.1

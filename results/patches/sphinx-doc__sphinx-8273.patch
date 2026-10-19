@@ -1,0 +1,6 @@
+--- a/sphinx/builders/manpage.py
++++ b/sphinx/builders/manpage.py
+@@ -82,6 +82,8 @@ class ManualPageBuilder(Builder):
+             targetname = f'{name}.{section}'
++            if not getattr(self.config, "man_make_section_directory", True):
++                targetname = path.basename(targetname)

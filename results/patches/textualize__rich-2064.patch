@@ -1,0 +1,6 @@
+--- a/rich/table.py
++++ b/rich/table.py
+@@ -470,6 +470,8 @@ class Table(JupyterMixin):
+         if width is None:
++            if max_width <= 0:
++                return

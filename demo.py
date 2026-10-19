@@ -89,9 +89,11 @@ def run_demo():
     p(f"\n{BOLD}{CYAN}======================================================================{RESET}")
     p(f"{BOLD}{CYAN} GEMMA 4 OFFLINE SWE AGENT — LIVE ONE-CLICK REPAIR DEMONSTRATION{RESET}")
     p(f"{BOLD}{CYAN}======================================================================{RESET}")
-    p(f"Target Model      : {BOLD}gemma-4-31b-it-qat-w4a16-ct{RESET} (Air-gapped / Zero-Cloud)")
+    p(f"Execution Mode    : {BOLD}Deterministic Trajectory Walkthrough (Sub-5s Zero-Cloud Emulation){RESET}")
+    p(f"Target Model      : {BOLD}gemma-4-31b-it-qat-w4a16-ct{RESET} (Frozen Phase 5 Policy)")
     p(f"Benchmark Instance: {BOLD}pallets__flask-4045 (SWE-bench Lite){RESET}")
-    p(f"Problem Statement : Blueprint names containing dots ('.') must raise ValueError.\n")
+    p(f"Problem Statement : Blueprint names containing dots ('.') must raise ValueError.")
+    p(f"Live Subprocesses : Temporary git repository, live in-memory SQLite AST graph, and real pytest subprocess.\n")
 
     t_start = time.perf_counter()
 

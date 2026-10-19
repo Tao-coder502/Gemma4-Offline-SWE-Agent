@@ -19,7 +19,7 @@ import zipfile
 from pathlib import Path
 
 
-def collect_entries(root: Path, phase: int = 3) -> list[tuple[str, Path]]:
+def collect_entries(root: Path, phase: int = 5) -> list[tuple[str, Path]]:
     entries: list[tuple[str, Path]] = []
 
     if phase == 2:
@@ -121,14 +121,18 @@ def build_zip(root: Path, output_file: str = "submission.zip", phase: int = 5, d
     with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zf:
         for arc, fp in entries:
             if arc == "agent.yaml" and phase in (4, 5):
-                content = fp.read_text(encoding="utf-8")
+                content = fp.read_text(encoding="utf-8").replace("\r\n", "\n")
                 content = content.replace("prompts/system_mode_d.md", "prompts/system.md")
                 content = content.replace("prompts/system_v5_optimized.md", "prompts/system.md")
                 content = content.replace("configs/phase5/v5_0_final/sampling.yaml", "configs/sampling.yaml")
                 zf.writestr("agent.yaml", content)
                 print(f"  added: {arc} (with prompts/system.md include)")
             else:
-                zf.write(fp, arc)
+                try:
+                    content = fp.read_text(encoding="utf-8").replace("\r\n", "\n")
+                    zf.writestr(arc, content)
+                except UnicodeDecodeError:
+                    zf.write(fp, arc)
                 print(f"  added: {arc}")
 
     size_kb = out.stat().st_size / 1024

@@ -1,0 +1,6 @@
+--- a/xarray/core/dataset.py
++++ b/xarray/core/dataset.py
+@@ -4102,6 +4102,8 @@ class Dataset(Mapping, ImplementsDatasetReduce, DataWithCoords):
+         if dim in self.indexes:
++            if not isinstance(self.indexes[dim], pd.MultiIndex):
++                return self

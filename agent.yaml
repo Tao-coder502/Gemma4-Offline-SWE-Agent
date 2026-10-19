@@ -4,7 +4,7 @@
 # Competition: Google - The Gemma 4 Developer Agent Competition
 # ============================================================
 
-name: gemma4_swe_agent
+name: gemma4_swe_agent_v5_optimized
 
 # Competition-mandated model identifier (QAT W4A16, offline-safe).
 # Do NOT change this value — it is required by the competition harness.

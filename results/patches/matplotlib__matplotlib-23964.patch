@@ -1,0 +1,8 @@
+--- a/lib/matplotlib/backends/backend_ps.py
++++ b/lib/matplotlib/backends/backend_ps.py
+@@ -665,6 +665,8 @@ class RendererPS(_RendererPSBase):
+         if isinstance(font, str):
+             font = get_font(font)
++        if font is None:
++            return
+         self._pswriter.write(f"% font: {font.fname}\n")

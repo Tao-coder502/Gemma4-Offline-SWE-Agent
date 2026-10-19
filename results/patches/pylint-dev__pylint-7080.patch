@@ -1,0 +1,6 @@
+--- a/pylint/lint/pylinter.py
++++ b/pylint/lint/pylinter.py
+@@ -582,6 +582,8 @@ class PyLinter(
+         for pattern in self.config.ignore_paths:
++            if pattern.endswith('/'):
++                pattern = pattern[:-1]

@@ -1,0 +1,6 @@
+--- a/pvlib/modelchain.py
++++ b/pvlib/modelchain.py
+@@ -812,6 +812,8 @@ class ModelChain:
+         if self.weather is not None:
++            if 'ghi' not in self.weather.columns or self.weather['ghi'].empty:
++                self.weather['ghi'] = 0.0

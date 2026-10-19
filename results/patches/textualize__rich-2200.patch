@@ -1,0 +1,6 @@
+--- a/rich/syntax.py
++++ b/rich/syntax.py
+@@ -310,6 +310,8 @@ class Syntax(JupyterMixin):
+         if self._theme is not None:
++            if isinstance(self._theme, str):
++                self._theme = PygmentsSyntaxTheme(self._theme)

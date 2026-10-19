@@ -1,0 +1,12 @@
+# Enforce LF line endings across all platforms for cryptographic hash stability
+* text eol=lf
+
+# Binary files
+*.zip binary
+*.tar binary
+*.gz binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.sqlite binary
+*.db binary

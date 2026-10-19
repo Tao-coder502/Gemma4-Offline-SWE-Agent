@@ -1,0 +1,9 @@
+--- a/django/utils/autoreload.py
++++ b/django/utils/autoreload.py
+@@ -139,6 +139,8 @@ def iter_modules_and_files(modules, extra_files):
+         try:
++            if '\x00' in str(path):
++                continue
+             resolved_path = path.resolve(strict=True)
+         except (FileNotFoundError, ValueError):
+             continue

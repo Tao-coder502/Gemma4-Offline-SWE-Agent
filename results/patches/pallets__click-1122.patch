@@ -1,0 +1,7 @@
+--- a/src/click/types.py
++++ b/src/click/types.py
+@@ -168,6 +168,8 @@ class Choice(ParamType):
+         if not self.case_sensitive:
++            norm_choices = {c.lower(): c for c in self.choices}
++            if value.lower() in norm_choices:
++                return norm_choices[value.lower()]

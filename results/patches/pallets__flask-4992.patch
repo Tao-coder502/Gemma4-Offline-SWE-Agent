@@ -1,0 +1,8 @@
+--- a/src/flask/config.py
++++ b/src/flask/config.py
+@@ -234,6 +234,8 @@ class Config(dict):
+         try:
++            if filename.endswith(".toml"):
++                import tomllib; return self.from_file(filename, load=tomllib.load)
+             return self.from_file(filename, load=json.load)
+         except (IOError, ValueError):
