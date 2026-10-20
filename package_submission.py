@@ -81,6 +81,9 @@ def collect_entries(root: Path, phase: int = 5) -> list[tuple[str, Path]]:
         adapters_readme = root / "adapters" / "README.md"
         if adapters_readme.exists():
             entries.append(("adapters/README.md", adapters_readme))
+        eval_config = root / "eval_config.yaml"
+        if eval_config.exists():
+            entries.append(("eval_config.yaml", eval_config))
 
     else:
         # Phase 4: Mode D — Adaptive graph + structured patch planning + test-driven repair

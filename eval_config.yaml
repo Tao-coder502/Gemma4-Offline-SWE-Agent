@@ -1,0 +1,12 @@
+# eval_config.yaml — Evaluation Configuration for Gemma 4 Offline SWE Agent
+# Conforms to Google ADK Agent Config and Competition Evaluation Specification.
+
+# Per-task execution limits
+per_task_timeout_seconds: 600       # 10 minutes ceiling per issue
+max_tool_calls_per_task: 30         # Strict tool call budget (agent uses ~7.50 avg)
+max_output_tokens: 32768            # Context window ceiling
+
+# Global evaluation limits
+total_timeout_hours: 12             # Competition global evaluation time ceiling
+early_stopping: true                # Early exit upon test verification (FAIL -> PASS)
+allow_network: false                # Air-gapped offline enforcement

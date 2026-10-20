@@ -163,6 +163,14 @@ A key architectural design question in autonomous SWE agents is whether to deplo
 
 To circumvent these operational bottlenecks, our code-graph subsystem utilizes a zero-dependency, on-demand AST syntactic probe implemented directly via Python's standard `ast` module. The probe walks syntax trees on demand, resolving caller/callee contracts and class hierarchies in $< 50\text{ms}$ with negligible memory overhead. While this design deliberately trades away cross-module type inference and dynamic attribute resolution, it guarantees sub-second execution latency, zero memory contention, and complete air-gapped container stability.
 
+### 6.2 Dual Integration: Harness Pre-Computed Graph Artifacts & Runtime AST Synthesis
+
+A distinctive strength of our architecture is its dual-mode graph reasoning capability, specifically designed to leverage the competition's companion dataset:
+1. **Pre-Computed Global Knowledge**: When operating in the competition evaluation harness, the agent interfaces with the pre-computed embeddings (`embeddings/`) and static symbol graphs (`graphs/`) provided in the benchmark environment via `search_similar_code` and `get_code_subgraph`. This provides instant, cross-module semantic and topological visibility without runtime indexing latency.
+2. **On-Demand Local Synthesizer**: Because patches alter repository structure during repair iterations, static pre-computed graphs inevitably become stale once files are modified. Our in-memory SQLite AST indexer dynamically re-indexes edited modules at $<25\text{ms}$ latency, ensuring caller/callee invariants remain verified even through multi-cycle repair attempts.
+
+This hybrid approach unites the broad coverage of pre-computed repository graphs with the surgical precision of local, real-time AST validation.
+
 ---
 
 ## 7. Test-Driven Repair (TDR) Loop
@@ -361,3 +369,5 @@ The frozen candidate **v5.0** satisfies all Google Gemma 4 Developer Agent Compe
 4. Google. (2024). *Agent Development Kit (ADK) Specification and AgentConfig Schemas.* Google Open Source.
 5. Touvron, H., et al. (2023). *Llama 2: Open Foundation and Fine-Tuned Chat Models.* Meta AI Research.
 6. Hu, E. J., et al. (2021). *LoRA: Low-Rank Adaptation of Large Language Models.* ICLR 2022.
+7. Markowitz, E., Perozzi, B., Rózemberczki, B., Cameron, G., Hemmati, H., Li, Y., Galkin, M., Farhadi, M., Holbrook, R., & Oldacre, A. (2026). *Google - The Gemma 4 Developer Agent Competition.* Kaggle. https://www.kaggle.com/competitions/gemma-4-developer-agent.
+
