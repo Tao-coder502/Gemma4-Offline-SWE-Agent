@@ -50,7 +50,7 @@ Our architecture introduces three primary contributions: (1) a \textbf{two-tier 
 \section{Introduction \& Problem Formulation}
 Modern software engineering agents evaluated on benchmarks such as SWE-bench \cite{jimenez2024swebench} are increasingly deployed in realistic enterprise environments characterized by strict operational constraints:
 \begin{itemize}
-    \item \textbf{Air-Gapped Isolation}: Complete absence of internet access, external web search engines, cloud APIs, and remote telemetry. All localization, analysis, code editing, and validation must execute strictly within the local container.
+    \item \textbf{Air-Gapped Isolation}: Complete absence of internet access, external web search engines, cloud APIs, and remote telemetry. All localization, analysis, code editing, and validation must execute strictly within the local container adhering to declarative agent specifications \cite{google2024adk}.
     \item \textbf{Quantized Edge Compute}: Models must execute locally under quantization (specifically 4-bit weight, 16-bit activation Quantization-Aware Training: \texttt{gemma-4-31b-it-qat-w4a16-ct} \cite{deepmind2024gemma}), constraining reasoning depth per turn.
     \item \textbf{Strict Tool and Token Budgets}: A hard budget limit of 30 tool calls per issue and a 32,768-token context window penalize exploratory trial-and-error, context stuffing, and runaway reflection loops.
     \item \textbf{Complex Multi-File Codebases}: Production repositories exhibit deep inheritance hierarchies, decorator-driven dynamic dispatch, and non-local failure cascades where the symptom is far removed from the root-cause defect.
@@ -59,7 +59,7 @@ Modern software engineering agents evaluated on benchmarks such as SWE-bench \ci
 Under these conditions, an agent cannot rely on brute-force re-indexing or broad context dumping. The primary challenge is formulating an agent reasoning policy that accurately pinpoints defects and applies minimal, regression-free patches within strict computational limits.
 
 \section{Motivation \& The Overhead Dilemma}
-Existing LLM-based software engineering agents generally follow one of two extremes:
+Existing LLM-based software engineering agents \cite{yao2023react, yang2024sweagent} generally follow one of two extremes:
 \begin{enumerate}
     \item \textbf{Flat Text / Semantic Retrieval}: The agent searches code using regular expressions or dense vector embeddings (\texttt{search\_similar\_code}). While efficient for localized, single-file leaf bugs, flat retrieval fails when identical symbol names exist across disparate packages, or when defects involve implicit interfaces where the failing test references an alias rather than the declaration.
     \item \textbf{Unconditional / Fixed Graph Reasoning}: Recognizing flat retrieval's blindness to structure, advanced frameworks query symbol dependency graphs or Abstract Syntax Tree (AST) call graphs on every candidate symbol. However, unconditional graph expansion introduces severe pathologies:
@@ -128,7 +128,7 @@ When an exact traceback isolates a self-contained leaf function (e.g., an off-by
 In an air-gapped container running a 31B parameter model, full LSP daemons (e.g., \texttt{pyright}) introduce severe penalties: consuming $2\text{--}4\text{ GB}$ of RAM, competing with model inference, and incurring $15\text{--}45\text{s}$ indexing cold starts. We deploy an in-memory SQLite AST syntactic probe via Python's standard library \texttt{ast} module. This guarantees sub-millisecond query execution, zero host memory contention, and complete air-gapped container stability.
 
 \subsection{Leveraging Pre-Computed Competition Graph Datasets}
-The competition environment \cite{markowitz2026gemma4competition} provides accompanying pre-computed graphs (\texttt{graphs/}) and dense embeddings (\texttt{embeddings/}). Our system employs a dual-integration mechanism: global cross-file visibility is bootstrapped instantly via the competition's pre-computed topological artifacts, while dynamic code edits during test-driven repair are indexed locally in $<25\text{ms}$ by the in-memory SQLite graph to guarantee real-time consistency.
+The competition environment \cite{markowitz2026gemma4competition} provides accompanying pre-computed graphs (\texttt{graphs/}) and dense embeddings (\texttt{embeddings/}), building on repository-level code reasoning paradigms \cite{bairi2023codeplan}. Our system employs a dual-integration mechanism: global cross-file visibility is bootstrapped instantly via the competition's pre-computed topological artifacts, while dynamic code edits during test-driven repair are indexed locally in $<25\text{ms}$ by the in-memory SQLite graph to guarantee real-time consistency.
 
 \section{Test-Driven Repair (TDR) Loop}
 Open-loop agents generate a patch and terminate blindly. In contrast, our closed-loop TDR engine performs:
@@ -201,7 +201,7 @@ With correctness established, Phase 5 introduced targeted engineering optimizati
     \item \textbf{Prompt Token Compaction}: Pruning instructions by $50.8\%$ decreased inference latency to $79.4\text{s}$.
     \item \textbf{Lexical-First Routing}: Prioritizing exact \texttt{rg} matches reduced tool calls from $9.88$ to $8.50$.
     \item \textbf{2D Coordinate Guard}: Relative coordinate instructions enabled \texttt{sympy} to be patched cleanly on the initial attempt, eliminating repair attempts entirely ($0.00$) and cutting average patch size to $10.9$ lines.
-    \item \textbf{PEFT/LoRA Adapter Ablation}: Evaluating a fine-tuned LoRA adapter ($r=16, \alpha=32$) yielded identical accuracy ($8/8$) but inflated latency from $90.2\text{s}$ to $235.5\text{s}$ ($+161.1\%$), confirming that in-context epistemic anchoring is substantially more efficient than adapter fine-tuning on 4-bit quantized models.
+    \item \textbf{PEFT/LoRA Adapter Ablation}: Evaluating a fine-tuned LoRA adapter \cite{hu2021lora} ($r=16, \alpha=32$) yielded identical accuracy ($8/8$) but inflated latency from $90.2\text{s}$ to $235.5\text{s}$ ($+161.1\%$), confirming that in-context epistemic anchoring is substantially more efficient than adapter fine-tuning on 4-bit quantized models.
 \end{itemize}
 
 \section{Failure Taxonomy \& Mitigations}
@@ -242,25 +242,28 @@ We introduced \textbf{Adaptive Repository Reasoning}, demonstrating that treatin
 \begin{thebibliography}{1}
 
 \bibitem{jimenez2024swebench}
-C.~E. Jimenez \emph{et~al.}, ``{SWE-bench: Can Language Models Resolve Real-World GitHub Issues?},'' in \emph{International Conference on Learning Representations (ICLR)}, 2024.
+C.~E. Jimenez, J.~Yang, A.~Wettig, S.~Yao, K.~Pei, O.~Press, and K.~Narasimhan, ``{SWE-bench: Can Language Models Resolve Real-World GitHub Issues?},'' in \emph{International Conference on Learning Representations (ICLR)}, 2024.
 
 \bibitem{deepmind2024gemma}
-{Google DeepMind Gemma Team}, ``{Gemma: Open Models Based on Gemini Research and Technology},'' Google DeepMind, Tech. Rep., 2024.
+{Google DeepMind Gemma Team}, ``{Gemma: Open Models Based on Gemini Research and Technology},'' Google DeepMind, Tech. Rep. arXiv:2403.08295, 2024.
 
 \bibitem{yang2024sweagent}
-J.~Yang \emph{et~al.}, ``{SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering},'' \emph{arXiv preprint arXiv:2405.15793}, 2024.
+J.~Yang, C.~E. Jimenez, A.~Wettig, K.~Lieret, S.~Yao, K.~Narasimhan, and O.~Press, ``{SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering},'' in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 2024. arXiv:2405.15793.
 
 \bibitem{google2024adk}
-Google, ``{Agent Development Kit (ADK) Specification and AgentConfig Schemas},'' Google Open Source, 2024.
+Google, ``{Agent Development Kit (ADK) Specification and AgentConfig Schemas},'' Google Open Source, 2024. [Online]. Available: \url{https://github.com/google/adk-python}
 
-\bibitem{touvron2023llama}
-H.~Touvron \emph{et~al.}, ``{Llama 2: Open Foundation and Fine-Tuned Chat Models},'' Meta AI Research, Tech. Rep., 2023.
+\bibitem{yao2023react}
+S.~Yao, J.~Zhao, D.~Yu, N.~Du, I.~Shafran, K.~Narasimhan, and Y.~Cao, ``{ReAct: Synergizing Reasoning and Acting in Language Models},'' in \emph{International Conference on Learning Representations (ICLR)}, 2023.
 
 \bibitem{hu2021lora}
-E.~J. Hu \emph{et~al.}, ``{LoRA: Low-Rank Adaptation of Large Language Models},'' in \emph{International Conference on Learning Representations (ICLR)}, 2022.
+E.~J. Hu, Y.~Shen, P.~Wallis, Z.~Allen-Zhu, Y.~Li, S.~Wang, L.~Wang, and W.~Chen, ``{LoRA: Low-Rank Adaptation of Large Language Models},'' in \emph{International Conference on Learning Representations (ICLR)}, 2022.
 
 \bibitem{markowitz2026gemma4competition}
 E.~Markowitz, B.~Perozzi, B.~R{\'o}zemberczki, G.~Cameron, H.~Hemmati, Y.~Li, M.~Galkin, M.~Farhadi, R.~Holbrook, and A.~Oldacre, ``{Google - The Gemma 4 Developer Agent Competition},'' Kaggle, 2026. [Online]. Available: \url{https://www.kaggle.com/competitions/gemma-4-developer-agent}
+
+\bibitem{bairi2023codeplan}
+R.~Bairi, A.~Sonwane, A.~Kanade, V.~D.~C., A.~Iyer, S.~Parthasarathy, S.~Rajamani, B.~Ashok, and S.~Shet, ``{CodePlan: Repository-level Coding using LLMs and Planning},'' in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 2023. arXiv:2309.12499.
 
 \end{thebibliography}
 

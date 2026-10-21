@@ -3,7 +3,7 @@
 **Track**: Kaggle Paper Track — Google Gemma 4 Developer Agent Competition  
 **Author**: Gemma 4 SWE Agent Engineering & Research Team  
 **System**: `gemma-4-31b-it-qat-w4a16-ct` (Offline / Air-Gapped)  
-**Artifact Repository**: `https://github.com/google-deepmind/gemma4-offline-swe-agent`  
+**Artifact Repository**: `https://github.com/Tao-coder502/Gemma4-Offline-SWE-Agent`  
 **Date**: October 2026  
 
 ---
@@ -23,9 +23,9 @@ Through rigorous, multi-phase ablation experiments across representative SWE ben
 
 ## 1. Problem
 
-Modern software engineering agents evaluated on benchmarks such as SWE-bench are increasingly deployed in realistic enterprise environments characterized by strict operational constraints:
-* **Air-Gapped Isolation**: Complete absence of internet access, external web search engines, cloud APIs, and remote telemetry. All localization, analysis, code editing, and validation must execute locally.
-* **Quantized Edge Compute**: Models must execute locally under quantization (specifically 4-bit weight, 16-bit activation Quantization-Aware Training: `gemma-4-31b-it-qat-w4a16-ct`), constraining reasoning depth per turn.
+Modern software engineering agents evaluated on benchmarks such as SWE-bench [1] are increasingly deployed in realistic enterprise environments characterized by strict operational constraints:
+* **Air-Gapped Isolation**: Complete absence of internet access, external web search engines, cloud APIs, and remote telemetry. All localization, analysis, code editing, and validation must execute strictly within the local container adhering to declarative agent specifications [4].
+* **Quantized Edge Compute**: Models must execute locally under quantization (specifically 4-bit weight, 16-bit activation Quantization-Aware Training: `gemma-4-31b-it-qat-w4a16-ct` [2]), constraining reasoning depth per turn.
 * **Strict Tool and Token Budgets**: A hard budget limit of 30 tool calls per issue and a 32,768-token context window punish exploratory trial-and-error, context stuffing, and runaway reflection loops.
 * **Complex Multi-File Codebases**: Production repositories (`requests`, `flask`, `pytest`, `matplotlib`, `sympy`, `sphinx`, `scikit-learn`, `astropy`) exhibit deep inheritance hierarchies, decorator-driven dynamic dispatch, and non-local failure cascades where the symptom is far removed from the root-cause defect.
 
@@ -35,7 +35,7 @@ Under these conditions, an agent cannot rely on brute-force re-indexing or broad
 
 ## 2. Motivation
 
-Existing LLM-based software engineering agents generally follow one of two extremes:
+Existing LLM-based software engineering agents [3, 5] generally follow one of two extremes:
 
 1. **Flat Text / Semantic Retrieval**: The agent searches code using regular expressions (`grep`, `rg`) or dense vector embeddings (`search_similar_code`). While efficient for localized, single-file leaf bugs, flat retrieval fails when:
    - Identical symbol names exist across disparate packages (e.g., conflicting `Request` models);
@@ -165,7 +165,7 @@ To circumvent these operational bottlenecks, our code-graph subsystem utilizes a
 
 ### 6.2 Dual Integration: Harness Pre-Computed Graph Artifacts & Runtime AST Synthesis
 
-A distinctive strength of our architecture is its dual-mode graph reasoning capability, specifically designed to leverage the competition's companion dataset:
+A distinctive strength of our architecture is its dual-mode graph reasoning capability, specifically designed to leverage the competition's companion dataset [7], building on principles of repository-level planning [8]:
 1. **Pre-Computed Global Knowledge**: When operating in the competition evaluation harness, the agent interfaces with the pre-computed embeddings (`embeddings/`) and static symbol graphs (`graphs/`) provided in the benchmark environment via `search_similar_code` and `get_code_subgraph`. This provides instant, cross-module semantic and topological visibility without runtime indexing latency.
 2. **On-Demand Local Synthesizer**: Because patches alter repository structure during repair iterations, static pre-computed graphs inevitably become stale once files are modified. Our in-memory SQLite AST indexer dynamically re-indexes edited modules at $<25\text{ms}$ latency, ensuring caller/callee invariants remain verified even through multi-cycle repair attempts.
 
@@ -193,7 +193,7 @@ Open-loop agents generate a patch and immediately terminate. In contrast, our TD
 ## 8. Experimental Design
 
 ### Benchmark Suite
-Experiments were conducted on $N=8$ diverse, real-world repositories from standard SWE benchmarks, partitioned to prevent data snooping:
+Experiments were conducted on $N=8$ diverse, real-world repositories from standard SWE-bench benchmarks [1], partitioned to prevent data snooping:
 
 | Task ID | Repository | Subsystem / Defect Type | Complexity |
 |---|---|---|---|
@@ -261,7 +261,7 @@ With the $100\%$ pass rate established in Mode D, Phase 5 focused on operational
 * **Prompt Compression (v4.2)**: Pruning verbose instructions reduced prompt token overhead by $50.8\%$, cutting latency from $86.6\text{s}$ to $79.4\text{s}$ ($-8.3\%$).
 * **Lexical-First Localization (v4.3)**: Prioritizing exact `rg` matching when error traces provide explicit symbols reduced average tool calls from $9.88$ to $8.50$ ($-14.0\%$).
 * **Patch Minimality & 2D Coordinate Guard (v4.4)**: Explicit instructions governing relative 2D coordinate calculations in pretty-printing enabled `sympy` to be patched correctly on the first attempt, reducing repair attempts from $0.12$ to **$0.00$** and average patch size from $13.0$ to $10.9$ lines.
-* **PEFT/LoRA Adapter Ablation (v4.6)**: Evaluating a fine-tuned LoRA adapter ($r=16, \alpha=32$) produced identical pass rate ($8/8$), but inflated runtime latency from $90.2\text{s}$ to $235.5\text{s}$ ($+161.1\%$) and violated ADK declarative schema rules. It was rejected.
+* **PEFT/LoRA Adapter Ablation (v4.6)**: Evaluating a fine-tuned LoRA adapter [6] ($r=16, \alpha=32$) produced identical pass rate ($8/8$), but inflated runtime latency from $90.2\text{s}$ to $235.5\text{s}$ ($+161.1\%$) and violated ADK declarative schema rules [4]. It was rejected.
 
 ---
 
@@ -363,11 +363,11 @@ The frozen candidate **v5.0** satisfies all Google Gemma 4 Developer Agent Compe
 
 ## References
 
-1. Jimenez, C. E., et al. (2024). *SWE-bench: Can Language Models Resolve Real-World GitHub Issues?* International Conference on Learning Representations (ICLR).
-2. DeepMind Gemma Team. (2024). *Gemma: Open Models Based on Gemini Research and Technology.* Google DeepMind Technical Report.
-3. Yang, J., et al. (2024). *SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering.* arXiv preprint arXiv:2405.15793.
-4. Google. (2024). *Agent Development Kit (ADK) Specification and AgentConfig Schemas.* Google Open Source.
-5. Touvron, H., et al. (2023). *Llama 2: Open Foundation and Fine-Tuned Chat Models.* Meta AI Research.
-6. Hu, E. J., et al. (2021). *LoRA: Low-Rank Adaptation of Large Language Models.* ICLR 2022.
+1. Jimenez, C. E., Yang, J., Wettig, A., Yao, S., Pei, K., Press, O., & Narasimhan, K. (2024). *SWE-bench: Can Language Models Resolve Real-World GitHub Issues?* International Conference on Learning Representations (ICLR).
+2. DeepMind Gemma Team. (2024). *Gemma: Open Models Based on Gemini Research and Technology.* Google DeepMind Technical Report. arXiv:2403.08295.
+3. Yang, J., Jimenez, C. E., Wettig, A., Lieret, K., Yao, S., Narasimhan, K., & Press, O. (2024). *SWE-agent: Agent-Computer Interfaces Enable Automated Software Engineering.* Advances in Neural Information Processing Systems (NeurIPS). arXiv:2405.15793.
+4. Google. (2024). *Agent Development Kit (ADK) Specification and AgentConfig Schemas.* Google Open Source. https://github.com/google/adk-python.
+5. Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K., & Cao, Y. (2023). *ReAct: Synergizing Reasoning and Acting in Language Models.* International Conference on Learning Representations (ICLR).
+6. Hu, E. J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., & Chen, W. (2022). *LoRA: Low-Rank Adaptation of Large Language Models.* International Conference on Learning Representations (ICLR).
 7. Markowitz, E., Perozzi, B., Rózemberczki, B., Cameron, G., Hemmati, H., Li, Y., Galkin, M., Farhadi, M., Holbrook, R., & Oldacre, A. (2026). *Google - The Gemma 4 Developer Agent Competition.* Kaggle. https://www.kaggle.com/competitions/gemma-4-developer-agent.
-
+8. Bairi, R., Sonwane, A., Kanade, A., D. C., V., Iyer, A., Parthasarathy, S., Rajamani, S., Ashok, B., & Shet, S. (2023). *CodePlan: Repository-level Coding using LLMs and Planning.* Advances in Neural Information Processing Systems (NeurIPS). arXiv:2309.12499.
