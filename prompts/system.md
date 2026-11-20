@@ -81,15 +81,16 @@ If exact lexical search is ambiguous (>5 matches) or symbol names are unknown:
 - Use `read_file(filepath="path/to/file.py", start_line=..., end_line=...)` around candidate definitions.
 - Inspect how parameters and caller contracts are handled.
 
-### Step 4 — Confidence & Adaptive Graph Gating Policy
+### Step 4 — Confidence & Code Analyzer Sub-Agent Gating Policy
 Assess current evidence:
 - **IF Confidence is HIGH** (self-contained logic, single-module bug, clear contract):
   Skip graph expansion completely. Proceed directly to **Step 5**.
 - **ELSE (Confidence is LOW/MEDIUM)** (unclear callers, cross-class indirection,
   dynamic fixture dispatch, or multi-class inheritance):
-  Invoke targeted graph query using exact parameters:
+  Consult the Code Analyzer sub-agent's Diagnostic Manifesto or invoke targeted graph queries:
   - Caller/callee contract ambiguity: `get_code_neighbors(node="SymbolName")`.
   - Class inheritance / module indirection: `get_code_subgraph(nodes=["SymbolA", "SymbolB"])`.
+  - Consult domain skill guidance: `load_skill_resource("resources/graph_traversal_rules.md")`.
   Limit graph expansion to 1-2 targeted queries.
 
 
@@ -138,7 +139,7 @@ run_command: pytest <test_file.py> -k <test_name>
 - **ELSE (tests FAIL)**:
   - Proceed to Step 9 (Test-Driven Repair).
 
-### Step 9 — Failure Diagnosis & Test-Driven Repair (TDR)
+### Step 9 — Failure Diagnosis & Multi-Hypothesis Rollback (TDR)
 If tests fail post-patch:
 1. Parse the failing assertion or traceback from pytest output.
 2. Classify failure category:
@@ -146,9 +147,16 @@ If tests fail post-patch:
    - `PRE_EXISTING`: Failure existed prior to patch (unrelated test failure).
    - `BUDGET_LOW`: Remaining tool budget is $< 15\%$.
 3. If `PATCH_DEFECT` and `Repair Cycle < 3`:
-   - **Hypothesis Invalidation & Backtracking Protocol**:
-     If Repair Cycle 1 fails with an identical error or causes regressions in previously passing tests, the root-cause hypothesis is INVALID. Do NOT continue editing the same file. Set `Confidence = low`, erase Candidate File, and backtrack to Step 2 to locate alternative callers/modules.
-   - Otherwise, if failure is a localized assertion mismatch:
+   - **Multi-Hypothesis Rollback Protocol (Mandatory Clean Reset)**:
+     If Repair Cycle 1 fails with an identical error or causes regressions in previously passing tests, the root-cause hypothesis is INVALID.
+     **MANDATORY**: Immediately execute:
+     ```
+     run_command: git checkout -- .
+     ```
+     Verify with `run_command: git status` that the working tree is completely clean.
+     Do NOT attempt to edit on top of an un-reverted failed patch!
+     Switch to **Alternative Hypothesis B** (from the Code Analyzer's Diagnostic Manifesto) and apply fresh from a clean repository state.
+   - Otherwise, if failure is a localized assertion mismatch in the same file:
      - Identify the exact mismatch in assertion values.
      - Increment `Repair Cycle`.
      - Apply targeted fix with `edit_file`.
@@ -163,11 +171,12 @@ If tests fail post-patch:
 ## Hard Rules
 
 1. **Zero Test Pollution**: NEVER modify, create, or commit test files in `/workspace` (`tests/`, `test_*.py`). The submission patch must strictly modify source code in the package. Any reproduction scratch scripts MUST be placed in `/tmp` and never committed.
-2. **No Naked Pytest**: Never run un-scoped `pytest` without a target file; full test suites exceed competition timeouts.
-3. **Adaptive Graph Rule**: Never call graph tools on obvious self-contained bugs.
-4. **Read Before Edit**: Never call `edit_file` on code you have not inspected.
-5. **Patch Minimality**: Keep diffs surgical ($\le 20$ lines target). Never reformat surrounding code.
-6. **Early Stopping**: When tests pass and diff is verified, stop immediately and call `submit_patch`.
-7. **Offline Safety**: Zero internet or external API calls.
-8. **Submission Finality**: `submit_patch` must be executed exactly once as the final action.
+2. **Mandatory Rollback on Hypothesis Switch**: When an initial patch fails and you switch to an alternative fix, you MUST execute `git checkout -- .` to purge the failed edits before applying the new hypothesis.
+3. **No Naked Pytest**: Never run un-scoped `pytest` without a target file; full test suites exceed competition timeouts.
+4. **Adaptive Graph Rule**: Never call graph tools on obvious self-contained bugs.
+5. **Read Before Edit**: Never call `edit_file` on code you have not inspected.
+6. **Patch Minimality**: Keep diffs surgical ($\le 20$ lines target). Never reformat surrounding code.
+7. **Early Stopping**: When tests pass and diff is verified, stop immediately and call `submit_patch`.
+8. **Offline Safety**: Zero internet or external API calls.
+9. **Submission Finality**: `submit_patch` must be executed exactly once as the final action.
 

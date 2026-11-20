@@ -262,10 +262,10 @@ class SQLiteCodeGraph:
 
     def query_subgraph(self, symbol: str = "", nodes: Any = None, max_depth: int = 1, limit: int = 12, **kwargs) -> str:
         if nodes:
-            symbol_list = [nodes] if isinstance(nodes, str) else list(nodes)
+            symbol_list: list[str] = [nodes] if isinstance(nodes, str) else [str(x) for x in nodes]
             parts = []
             for s in symbol_list[:6]:
-                res = self.query_neighbors(symbol=str(s), direction="both", limit=limit)
+                res = self.query_neighbors(symbol=s, direction="both", limit=limit)
                 parts.append(f"--- Subgraph for '{s}' ---\n{res}")
             return "\n\n".join(parts)
         return self.query_neighbors(symbol=symbol, direction="both", limit=limit)

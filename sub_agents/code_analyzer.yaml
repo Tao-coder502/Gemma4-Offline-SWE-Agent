@@ -1,0 +1,23 @@
+# ============================================================
+# Gemma 4 Offline SWE Agent — Code Analyzer Sub-Agent
+# Competition: Google - The Gemma 4 Developer Agent Competition
+# ============================================================
+
+name: code_analyzer
+
+# Mandatory: Must use the exact same model variant as the root agent.
+model: gemma-4-31b-it-qat-w4a16-ct
+
+description: >
+  Specialized read-only code intelligence sub-agent for repository navigation,
+  semantic code search, and dependency call graph analysis. Evaluates symbol
+  hierarchies and returns an authoritative Diagnostic Manifesto to the Coder agent.
+
+instruction: !include ../prompts/analyzer.md
+
+# Read-only graph and file inspection tools
+tools:
+  - search_similar_code
+  - get_code_neighbors
+  - get_code_subgraph
+  - read_file

@@ -194,8 +194,8 @@ Every numerical value originates from audited, immutable execution traces across
 | **Pass Rate Delta** | Baseline | $+12.5\text{ pp}$ | $+25.0\text{ pp}$ | $+37.5\text{ pp}$ | **$+50.0\text{ pp}$** | **$+50.0\text{ pp}$** |
 | **Avg Tool Calls / Task** | $12.88$ | $11.12$ | $15.25$ | $9.62$ | $9.88$ | **$7.50$** ($-41.8\%$) |
 | **Avg Semantic Calls** | $1.25$ | $1.12$ | $1.00$ | $1.00$ | $1.00$ | **$0.50$** ($-60.0\%$) |
-| **Avg Graph Calls** | $0.00$ | $0.00$ | $3.000$ | $0.375$ | $0.375$ | **$0.375$** |
-| **Total Graph Calls ($N=8$)**| $0$ | $0$ | $24$ | $3$ | $3$ | **$3$** ($-87.5\%$) |
+| **Avg Graph Calls** | $0.00$ | $0.00$ | $2.125$ | $0.375$ | $0.375$ | **$0.375$** |
+| **Total Graph Calls ($N=8$)**| $0$ | $0$ | $17$ | $3$ | $3$ | **$3$** ($-82.4\%$) |
 | **Avg Files Inspected** | $1.62$ | $1.38$ | $1.38$ | $1.12$ | $1.12$ | **$1.00$** |
 | **Avg Files Edited** | $0.88$ | $0.88$ | $1.00$ | $1.00$ | $1.00$ | **$1.00$** |
 | **Avg Patch Size (lines)**| $16.5$ | $13.8$ | $14.2$ | $12.8$ | $13.0$ | **$10.9$** ($-33.9\%$) |
@@ -250,7 +250,7 @@ Gemma4-Offline-SWE-Agent/
 ├── package_submission.py      # Competition zip archive packager & validator
 ├── validate_agent_yaml.py     # ADK schema and configuration validator
 ├── validate_system_md.py      # System prompt compliance validator
-└── submission.zip             # Ready-to-submit archive (5.3 KB, fully verified)
+└── submission.zip             # Ready-to-submit archive (7.1 KB, fully verified)
 ```
 
 ---

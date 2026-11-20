@@ -10,15 +10,18 @@ name: gemma4_swe_agent_v5_optimized
 # Do NOT change this value — it is required by the competition harness.
 model: gemma-4-31b-it-qat-w4a16-ct
 
+# Competition PEFT LoRA adapter (located at adapters/main_lora/)
+adapter: main_lora
+
 description: >
   A production SWE agent for offline / air-gapped execution. Combines two-tier
   lexical-first localization, confidence-gated adaptive structural code-graph reasoning,
   compact 11-slot internal state tracking, patch minimality enforcement, bounded
-  test-driven repair (max 3 cycles), and explicit early stopping to maximize benchmark
-  pass rate while minimizing tool calls and execution latency. No external APIs.
+  test-driven repair (max 3 cycles), multi-hypothesis git rollback, and explicit
+  early stopping to maximize benchmark pass rate while minimizing tool calls. No external APIs.
 
 # System prompt is maintained in a separate file for auditability.
-instruction: !include prompts/system_v5_optimized.md
+instruction: !include prompts/system.md
 
 # ── Tool registry (Phase 3) ────────────────────────────────────────────────
 # Full repository reasoning suite: core environment tools + semantic search

@@ -222,7 +222,7 @@ def run_demo():
         p(f" {BOLD}1. Instant Reproducibility :{RESET} Full repair executed locally in {t_total:.2f}s (No GPU needed)")
         p(f" {BOLD}2. The Efficiency Moat     :{RESET} Consumed {BOLD}3/30 calls{RESET} (90% headroom) | Index: {t_index:.2f}ms | Query: {t_query:.3f}ms")
         p(f"                            Production Benchmark Avg: {BOLD}7.50 calls/task (75% Headroom){RESET}")
-        p(f" {BOLD}3. Dual-Track Alignment    :{RESET} [Track 1] submission.zip (<10KB, 81/81 ADK checks PASS)")
+        p(f" {BOLD}3. Dual-Track Alignment    :{RESET} [Track 1] submission.zip (<10KB, 90/90 ADK checks PASS)")
         p(f"                            [Track 2] paper/PAPER.md (14-Section Research Paper)")
         p(f" {BOLD}4. Defense-in-Depth SAST   :{RESET} {sast_status}")
         p(f"{BOLD}{GREEN}======================================================================{RESET}\n")

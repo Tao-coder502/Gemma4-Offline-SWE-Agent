@@ -1,7 +1,7 @@
 {
   "manifest_version": "1.0",
-  "audit_timestamp": "2026-10-16T22:02:06.842068+00:00",
-  "git_commit": "8760f90667b6b4c617fb4d27bad05ace40087783",
+  "audit_timestamp": "2026-10-27T18:45:09.105752+00:00",
+  "git_commit": "26ec5625459e2d22fc6edfafc2bed9cf4a6ab365",
   "model": "gemma-4-31b-it-qat-w4a16-ct",
   "sampling_config": {
     "path": "configs/sampling.yaml",

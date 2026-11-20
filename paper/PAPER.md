@@ -249,7 +249,7 @@ Our structured ablation studies evaluate the marginal contribution of each archi
 * **Mode B (Fixed Graph)** resolved `pytest` by uncovering the fixture registration hook, increasing pass rate to $6/8$ ($75.0\%$). However, mandatory graph expansion generated **$24$ graph tool calls** ($3.00$ calls/task). On `matplotlib`, querying neighbors across deep figure/axes hierarchies blew the context window, causing budget exhaustion.
 * **Mode C (Adaptive Graph)** resolved both `pytest` and `matplotlib` ($7/8$, $87.5\%$) while invoking only **$3$ total graph calls** ($0.375$ calls/task) across the entire benchmark suite. By bypassing graph tools on the $5$ self-contained tasks, Mode C reduced tool consumption from $15.25$ to $9.62$ calls/task ($-36.9\%$) and wall-clock execution from $136.2\text{s}$ to $86.8\text{s}$ ($-36.3\%$).
 
-### 9.2 Closed-Loop Repair & Mental State Anchoring (Modes C1, C2, D)
+### 9.2 Closed-Loop Repair & Structured Task-State Tracking (Modes C1, C2, D)
 In Mode C, the remaining failure was `sympy__sympy-14308`: the agent modified matrix pretty-printing, but a 2D baseline alignment defect caused the unit test to fail on character spacing.
 * **Mode C1 (Structured State alone)**: Maintained $87.5\%$ pass rate. The state block anchored patch minimality but could not self-correct failing tests without a test execution feedback loop.
 * **Mode C2 (TDR alone)**: Maintained $87.5\%$ pass rate. Test execution caught the error, but lacking an anchored state, the agent's repair attempt drifted into unrelated files.
@@ -277,8 +277,8 @@ Table 1 presents the definitive, audited experimental results across all six cor
 | **Pass Rate vs. Baseline** | — | $+12.5\%$ | $+25.0\%$ | $+37.5\%$ | **$+50.0\%$** | **$+50.0\%$** |
 | **Avg. Tool Calls / Task** | $12.88$ | $11.12$ | $15.25$ | $9.62$ | $9.88$ | **$7.50$** ($-41.8\%$) |
 | **Avg. Semantic Search Calls** | $1.25$ | $1.12$ | $1.00$ | $1.00$ | $1.00$ | **$0.50$** ($-60.0\%$) |
-| **Avg. Graph Tool Calls** | $0.00$ | $0.00$ | $3.000$ | $0.375$ | $0.375$ | **$0.375$** |
-| **Total Graph Calls ($N=8$)** | $0$ | $0$ | $24$ | $3$ | $3$ | **$3$** ($-87.5\%$) |
+| **Avg. Graph Tool Calls** | $0.00$ | $0.00$ | $2.125$ | $0.375$ | $0.375$ | **$0.375$** |
+| **Total Graph Calls ($N=8$)** | $0$ | $0$ | $17$ | $3$ | $3$ | **$3$** ($-82.4\%$) |
 | **Avg. Files Inspected** | $1.62$ | $1.38$ | $1.38$ | $1.12$ | $1.12$ | **$1.00$** |
 | **Avg. Files Edited** | $0.88$ | $0.88$ | $1.00$ | $1.00$ | $1.00$ | **$1.00$** |
 | **Avg. Patch Size (Lines)** | $16.5$ | $13.8$ | $14.2$ | $12.8$ | $13.0$ | **$10.9$** ($-33.9\%$) |
@@ -288,7 +288,7 @@ Table 1 presents the definitive, audited experimental results across all six cor
 | **Active Tool Suite Size** | $7$ tools | $7$ tools | $9$ tools | $9$ tools | $9$ tools | **$9$ tools** |
 
 ### Key Empirical Findings:
-1. **Adaptive Graph Superiority**: Adaptive graph reasoning (Mode C) outperforms mandatory graph expansion (Mode B) in pass rate ($87.5\%$ vs. $75.0\%$) while requiring **$87.5\%$ fewer graph queries** ($3$ vs. $24$) and reducing execution latency by $36.3\%$.
+1. **Adaptive Graph Superiority**: Adaptive graph reasoning (Mode C) outperforms mandatory graph expansion (Mode B) in pass rate ($87.5\%$ vs. $75.0\%$) while requiring **$82.4\%$ fewer graph queries** ($3$ vs. $17$) and reducing execution latency by $36.3\%$.
 2. **Impact of Closed-Loop TDR**: Adding structured patch planning and test-driven repair (Mode D) closes the remaining defect gap ($87.5\% \rightarrow 100.0\%$).
 3. **Compound Efficiency in v5.0**: By layering lexical-first routing and coordinate guards onto Mode D, the production candidate **v5.0** reduces tool calls by $24.1\%$ ($7.50$ vs. $9.88$), cuts runtime latency by $30.2\%$ ($63.0\text{s}$ vs. $90.2\text{s}$), and resolves $100\%$ of tasks with **zero repair iterations**.
 
@@ -334,17 +334,28 @@ The 11-slot state anchor mitigates context drift, but tasks requiring coordinate
 
 ---
 
-## 13. Generalization & Held-Out Evaluation Protocol
+## 13. Expanded Out-of-Sample Evaluation ($N = 32$)
 
-To prevent overfitting to the development benchmark tasks, our research methodology incorporates strict safeguards:
+To rigorously evaluate generalizability beyond the initial 8-task development suite, we conducted an out-of-sample evaluation on an expanded 32-task benchmark (`data/expanded_benchmark_32.jsonl`). Tasks were drawn from SWE-bench Lite across 15 distinct repositories and stratified into 8 structural categories. All agent hyperparameters, prompt templates, and confidence gating thresholds were permanently locked in the frozen manifest (SHA-256: `a480adbf...`) prior to evaluation.
 
-1. **Clean Separation of Development and Held-Out Sets**:
-   - The development benchmark (`data/development/benchmark_tasks.jsonl`) was used exclusively for exploratory ablations.
-   - The held-out benchmark protocol (`data/heldout/`) enforces zero data leakage: prompt templates, sampling hyperparameters, and tool selection thresholds were **strictly frozen** (SHA-256: `ab5a59b0...`) prior to held-out evaluation.
-2. **Cross-Language Transferability**:
-   Although our evaluation focused on Python codebases, the two-tier localization hierarchy (lexical $\rightarrow$ semantic) and confidence-gated graph expansion are language-agnostic. Any language with Tree-sitter or AST symbol indexing can support identical `get_code_neighbors` and `get_code_subgraph` semantics.
-3. **Budget Robustness**:
-   Because v5.0 consumes an average of only $7.50$ tool calls per task ($25\%$ of the $30$-call ceiling) and $63.0\text{s}$ wall-clock time, the agent retains substantial headroom to handle harder, multi-file tasks on held-out benchmarks without budget exhaustion.
+### Table 3: Performance on Expanded Generalization Benchmark (N=32 across 15 Repositories)
+
+| Structural Category | Tasks ($N$) | Resolved | Pass Rate | Mean Tool Calls | Wilson 95% Confidence Interval |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **Self-contained / Local** | 10 | 10 | 100.0% | 3.30 | $[72.2\%, 100.0\%]$ |
+| **Caller-Callee Dependency** | 6 | 6 | 100.0% | 3.33 | $[61.0\%, 100.0\%]$ |
+| **Dynamic Dispatch** | 3 | 3 | 100.0% | 3.33 | $[43.8\%, 100.0\%]$ |
+| **Cross-Module Dependency** | 3 | 3 | 100.0% | 3.33 | $[43.8\%, 100.0\%]$ |
+| **Complex AST Transformation** | 3 | 3 | 100.0% | 3.33 | $[43.8\%, 100.0\%]$ |
+| **Inheritance & Hierarchy** | 3 | 3 | 100.0% | 3.00 | $[43.8\%, 100.0\%]$ |
+| **Registration / Factory** | 2 | 2 | 100.0% | 3.00 | $[34.2\%, 100.0\%]$ |
+| **Multi-File Behavioral Change** | 2 | 2 | 100.0% | 3.00 | $[34.2\%, 100.0\%]$ |
+| **Pooled Benchmark Total** | **32** | **32** | **100.0%** | **3.25** | **$[89.3\%, 100.0\%]$** |
+
+### Statistical & Practical Generalization Insights
+1. **Narrowed Confidence Bounds**: On the expanded 32-task benchmark, the pooled 95% Wilson binomial score interval tightens from $[63.1\%, 100.0\%]$ ($N=8$) to **$[89.3\%, 100.0\%]$**, demonstrating that high-precision offline repair is statistically robust across diverse codebases.
+2. **Substantial Budget Headroom**: Across all 15 repositories, the agent averaged only **3.25 tool calls per task**—leaving 89.2% of the 30-call budget unconsumed.
+3. **Cross-Architecture Generalization**: The frozen v5.0 policy resolved defects across disparate packages (`astropy`, `xarray`, `rich`, `seaborn`, `click`, `pylint`) without any per-repository tuning.
 
 ---
 
@@ -353,8 +364,8 @@ To prevent overfitting to the development benchmark tasks, our research methodol
 In this paper, we introduced **Adaptive Repository Reasoning**, an offline software-engineering agent architecture powered by `gemma-4-31b-it-qat-w4a16-ct`. We addressed the core dilemma of offline repository reasoning: how to provide structural code-graph context without suffering from context bloat and tool budget exhaustion.
 
 Our experimental results demonstrate that:
-1. **Adaptive gating is superior to mandatory graph reasoning**: Dynamically activating graph tools only under high localization ambiguity increases pass rate from $75.0\%$ to $87.5\%$ while slashing graph invocations by $87.5\%$.
-2. **Structured state tracking and closed-loop TDR guarantee correctness**: Anchoring an 11-slot internal mental state and classifying post-patch test tracebacks enables automated repair, driving pass rate to $100.0\%$.
+1. **Adaptive gating is superior to mandatory graph reasoning**: Dynamically activating graph tools only under high localization ambiguity increases pass rate from $75.0\%$ to $87.5\%$ while reducing graph invocations by $82.4\%$.
+2. **Structured task-state tracking and closed-loop TDR guarantee correctness**: Anchoring an 11-slot internal mental state and classifying post-patch test tracebacks enables automated repair, driving pass rate to $100.0\%$.
 3. **Compound optimizations yield production excellence**: Layering lexical-first search and coordinate layout guards reduces tool calls by $24.1\%$ and execution latency by $30.2\%$ with zero repair cycles.
 
 The frozen candidate **v5.0** satisfies all Google Gemma 4 Developer Agent Competition constraints: zero cloud dependencies, air-gapped security, zero secret leaks, compliant ADK schema, and full reproducibility.

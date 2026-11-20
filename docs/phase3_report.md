@@ -127,7 +127,7 @@ Running the cross-mode analysis (`python tools/analyze_results.py --compare resu
 | **Resolved Tasks** | 5 / 8 | 6 / 8 | **7 / 8** |
 | **Avg Tool Calls / Task** | 11.12 | 15.25 | **9.62** |
 | **Avg Semantic Searches** | 1.12 | 1.00 | **1.00** |
-| **Avg Graph Calls / Task** | 0.00 | 3.00 | **0.38** |
+| **Avg Graph Calls / Task** | 0.00 | 2.125 | **0.375** |
 | **Avg Symbols Inspected** | 0.00 | 2.50 | **0.38** |
 | **Avg Files Inspected** | 1.38 | 1.38 | **1.12** |
 | **Avg Files Edited** | 0.88 | 1.00 | **1.00** |

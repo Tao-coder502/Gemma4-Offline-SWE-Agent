@@ -23,7 +23,7 @@ On the eight-task Phase 4 evaluation suite derived from SWE-bench repositories (
 
 ### Key Audited Findings (Suite-Bounded)
 1. **Adaptive Structural Reasoning on Non-Local Tasks**: Within the eight-task evaluation suite, adaptive structural reasoning (Mode C) achieved a higher task-resolution rate than semantic search alone (Mode A), representing a difference of $+25.0\text{ percentage points (pp)}$ ($62.5\% \rightarrow 87.5\%$). Structural queries provided critical incoming caller and fixture dispatch context on tasks where defect manifestations were separated from the causal implementation (`matplotlib-23456`, `pytest-5221`).
-2. **Exploration Overhead Reduction vs. Fixed Graph**: Unconditional mandatory graph traversal (Mode B) executed $24$ total graph queries ($3.00\text{ calls/task}$) and averaged $15.25\text{ tool calls/task}$, resulting in tool budget exhaustion on a deep class hierarchy task (`sphinx-8721`). Confidence-gated adaptive graph reasoning (Mode C) reduced graph queries by $87.5\%$ down to $3$ total calls ($0.375\text{ calls/task}$, displayed as $0.38$), while improving task resolution by $+12.5\text{ pp}$ ($75.0\% \rightarrow 87.5\%$).
+2. **Exploration Overhead Reduction vs. Fixed Graph**: Unconditional mandatory graph traversal (Mode B) executed $17$ total graph queries ($2.125\text{ calls/task}$) and averaged $15.25\text{ tool calls/task}$, resulting in tool budget exhaustion on a deep class hierarchy task (`sphinx-8721`). Confidence-gated adaptive graph reasoning (Mode C) reduced graph queries by $82.4\%$ down to $3$ total calls ($0.375\text{ calls/task}$, displayed as $0.38$), while improving task resolution by $+12.5\text{ pp}$ ($75.0\% \rightarrow 87.5\%$).
 3. **Disentangling Localization from Repair**: Graph-based structural reasoning resolved localization challenges but did not inherently guarantee syntactically and semantically correct patch generation. In `sympy-14308`, Mode C achieved correct localization and root-cause identification via graph caller analysis, but generated an initial patch with misaligned 2D layout indentation, causing test validation failure.
 4. **Contribution of Structured Repair (Mode D)**: Mode D is a compound configuration combining adaptive graph reasoning, an 11-slot structured internal state, and closed-loop test-driven repair. In `sympy-14308`, Mode D's test-driven repair loop parsed the test traceback, classified the failure as `PATCH_DEFECT`, revised the patch plan, and produced a verified passing patch on cycle 1, enabling Mode D to pass all 8 tasks in the Phase 4 evaluation suite ($+12.5\text{ pp}$ over Mode C).
 5. **Preliminary Nature of Findings**: The eight-task evaluation suite is insufficient to establish broad generalization. All numerical results represent observed outcomes on this benchmark and must be replicated across larger, stratified task sets before broad claims of superiority or universal efficacy can be made.
@@ -132,8 +132,8 @@ All metrics below were computed directly from immutable raw JSONL execution trac
 | **Pass Rate Difference vs Mode C** | — | — | Baseline | $+12.5\text{ pp}$ |
 | **Avg Tool Calls / Task** | 11.125 | 15.250 | 9.625 | 9.875 |
 | **Avg Semantic Calls / Task** | 1.125 | 1.000 | 1.000 | 1.000 |
-| **Avg Graph Calls / Task** | 0.000 | 3.000 | **0.375** *(~0.38)* | **0.375** *(~0.38)* |
-| **Total Graph Calls** | 0 | 24 | 3 | 3 |
+| **Avg Graph Calls / Task** | 0.000 | 2.125 | **0.375** *(~0.38)* | **0.375** *(~0.38)* |
+| **Total Graph Calls** | 0 | 17 | 3 | 3 |
 | **Avg Files Inspected / Task** | 1.375 | 1.375 | 1.125 | 1.125 |
 | **Avg Files Edited / Task** | 0.875 | 1.000 | 1.000 | 1.000 |
 | **Avg Patch Size (lines)** | 13.75 | 14.25 | 12.75 | 13.00 |
@@ -154,7 +154,7 @@ The accounting for graph calls has been reconciled across all 32 task-mode execu
 
 ### Reconciled Summary
 * **Mode A**: 0 total graph calls $\rightarrow 0 / 8 = 0.000\text{ calls/task}$.
-* **Mode B**: 24 total graph calls $\rightarrow 24 / 8 = 3.000\text{ calls/task}$.
+* **Mode B**: 17 total graph calls $\rightarrow 17 / 8 = 2.125\text{ calls/task}$.
 * **Mode C**: 3 total graph calls $\rightarrow 3 / 8 = 0.375\text{ calls/task}$ (displayed rounded as $0.38$).
 * **Mode D**: 3 total graph calls $\rightarrow 3 / 8 = 0.375\text{ calls/task}$ (displayed rounded as $0.38$).
 
@@ -271,7 +271,7 @@ It is scientifically invalid to attribute the entire difference between Mode A (
 The experimental progression isolates two distinct mechanisms:
 1. **Primary Research Question (Graph Routing Effect: Modes A, B, C)**:
    * Compares semantic-only search (Mode A), mandatory graph expansion (Mode B), and confidence-gated adaptive graph expansion (Mode C).
-   * **Result**: Mode C improved resolution by $+25.0\text{ pp}$ over Mode A while reducing graph calls by $87.5\%$ relative to Mode B. This cleanly isolates the adaptive graph-routing effect.
+   * **Result**: Mode C improved resolution by $+25.0\text{ pp}$ over Mode A while reducing graph calls by $82.4\%$ relative to Mode B. This cleanly isolates the adaptive graph-routing effect.
 2. **Compound Capability Question (Structured Repair Effect: Mode C vs. Mode D)**:
    * Mode D is a compound configuration combining:
      $$\text{Mode D} = \text{Mode C (Adaptive Graph)} + \text{Structured Internal State} + \text{Bounded Test-Driven Repair}$$

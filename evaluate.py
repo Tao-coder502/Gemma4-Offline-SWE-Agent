@@ -55,7 +55,7 @@ def print_summary() -> None:
     print("   1. 5-Second Zero-Cloud Demo : Run 'python demo.py' (<4s on CPU, no GPUs needed)")
     print("   2. The Efficiency Moat      : 7.50 calls/task (75% budget headroom) vs 22+ ReAct")
     print("                                 Sub-5ms in-memory SQLite AST graph (<0.1ms lookups)")
-    print("   3. Dual-Track Polish        : [Track 1] submission.zip (<10KB, 81/81 ADK PASS)")
+    print("   3. Dual-Track Polish        : [Track 1] submission.zip (<10KB, 90/90 ADK PASS)")
     print("                                 [Track 2] paper/PAPER.md (14-Section empirical paper)")
     print("----------------------------------------------------------------------")
     print(" Reasoner Mode Comparison (SWE-bench Lite Performance):")

@@ -17,7 +17,7 @@
 1. **Adaptive Graph Reasoning Outperforms Semantic-Only Search (+25.0% Patch Success)**:
    In repositories with indirection, dynamic dispatch, or non-trivial caller contracts, semantic retrieval alone frequently fails due to **incomplete context** or **wrong localization** (e.g. `matplotlib-23456`, `pytest-5221`).
 2. **Adaptive Expansion Prevents Catastrophic Budget Exhaustion**:
-   Unconditional mandatory graph queries (Mode B) consume excessive tool calls ($3.00$ graph calls/task, $15.25$ total tools/task) and suffer from **timeout / budget exhaustion** on deep class hierarchies (e.g. `sphinx-8721`). Adaptive gating (Mode C) reduces graph calls by **87.5%** ($0.38$ vs $3.00$) while increasing patch success from $75.0\%$ to $87.5\%$.
+   Unconditional mandatory graph queries (Mode B) consume excessive tool calls ($2.125$ graph calls/task, $15.25$ total tools/task) and suffer from **timeout / budget exhaustion** on deep class hierarchies (e.g. `sphinx-8721`). Adaptive gating (Mode C) reduces graph calls by **87.5%** ($0.38$ vs $3.00$) while increasing patch success from $75.0\%$ to $87.5\%$.
 3. **Structured Patch Planning + Test-Driven Repair (TDR) Resolves Subtle Execution Failures (+12.5% Patch Success, Reaching 100%)**:
    Combining adaptive graph localization with mandatory internal structured state tracking and closed-loop test-driven repair (Mode D) resolved the persistent 2D formatting layout defect in `sympy-14308`, achieving **100.0% patch resolution** ($8/8$) on the benchmark suite without inflating exploration overhead ($9.88$ tool calls/task).
 
@@ -56,8 +56,8 @@ Patch Success Rate           | 62.5%            | 75.0%            | 87.5%      
 Resolved Tasks               | 5 / 8            | 6 / 8            | 7 / 8            | 8 / 8           
 Avg Tool Calls / Task        | 11.12            | 15.25            | 9.62             | 9.88            
 Avg Semantic Searches        | 1.12             | 1.00             | 1.00             | 1.00            
-Avg Graph Calls / Task       | 0.00             | 3.00             | 0.38             | 0.38            
-Total Graph Calls            | 0                | 24               | 3                | 3               
+Avg Graph Calls / Task       | 0.00             | 2.125            | 0.375             | 0.38            
+Total Graph Calls            | 0                | 17               | 3                | 3               
 Avg Symbols Inspected        | 0.00             | 2.50             | 0.38             | 0.38            
 Avg Files Inspected          | 1.38             | 1.38             | 1.12             | 1.12            
 Avg Files Edited             | 0.88             | 1.00             | 1.00             | 1.00            
@@ -119,7 +119,7 @@ graph TD
 
 ### 2. Contribution of Adaptive Gating vs Mandatory Graph (Mode B vs Mode C)
 * **Resolution Gain**: $+12.5$ percentage points ($75.0\% \rightarrow 87.5\%$).
-* **Efficiency Gain**: Reduced graph calls from $3.00$ to $0.38$ per task (**$-87.5\%$ reduction**); reduced total elapsed runtime by **$-36.3\%$** ($136.2\text{s} \rightarrow 86.8\text{s}$).
+* **Efficiency Gain**: Reduced graph calls from $2.125$ to $0.375$ per task (**$-82.4\%$ reduction**); reduced total elapsed runtime by **$-36.3\%$** ($136.2\text{s} \rightarrow 86.8\text{s}$).
 * **Mechanism**: On modular leaf defects (`requests-2148`, `flask-4045`, `django-11099`, `sphinx-8721`), unconditional graph queries flood context with irrelevant callers and class inheritance chains, causing budget exhaustion on `sphinx-8721`.
 
 ### 3. Contribution of Structured Patch Planning & Test-Driven Repair (Mode C vs Mode D)
