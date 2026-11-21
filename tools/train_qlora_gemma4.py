@@ -49,6 +49,9 @@ def load_swe_dataset(data_path: Path):
     return tasks
 
 def format_training_example(task: dict) -> list:
+    if "messages" in task and isinstance(task["messages"], list):
+        return task["messages"]
+        
     task_id = task.get("task_id", "")
     issue = task.get("issue", "")
     test_cmd = task.get("test_cmd", "")
